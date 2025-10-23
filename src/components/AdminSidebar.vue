@@ -81,7 +81,7 @@ const isActive = (path) => route.path === path
 
 
 <style scoped>
-@reference "../style.css";
+@reference "tailwindcss";
 
 .router-link-active {
   @apply bg-green-100 text-green-700 font-semibold;

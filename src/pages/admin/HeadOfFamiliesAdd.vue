@@ -113,7 +113,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import axios from "axios";
 import { User } from "lucide-vue-next";
 
@@ -162,32 +162,50 @@ async function submitForm() {
     });
 
     const userId = registerResponse.data.user.id;
+    const hofId = registerResponse.data.head_of_family?.id; // gunakan optional chaining
 
-    // 2️⃣ Buat HeadOfFamily baru
-    const headData = {
-      user_id: userId,
-      profile_picture: form.value.foto ? form.value.foto.name : null,
-      nik: form.value.nik,
-      gender: form.value.jenis_kelamin,
-      date_of_birth: form.value.tanggal_lahir,
-      phone_number: form.value.ponsel,
-      address: form.value.alamat,
-      occupation: form.value.pekerjaan,
-      marital_status: form.value.status,
-    };
+    const formData = new FormData();
+    formData.append('user_id', userId);
+    if (form.value.foto) {
+      formData.append('profile_picture', form.value.foto);
+    }
+    formData.append('nik', form.value.nik);
+    formData.append('gender', form.value.jenis_kelamin);
+    formData.append('date_of_birth', form.value.tanggal_lahir);
+    formData.append('phone_number', form.value.ponsel);
+    formData.append('address', form.value.alamat);
+    formData.append('occupation', form.value.pekerjaan);
+    formData.append('marital_status', form.value.status);
 
-    await axios.post("http://localhost:8000/api/head-of-families", headData);
+    const token = localStorage.getItem('token');
+
+    // 2️⃣ Jika sudah ada HeadOfFamily otomatis → update saja
+    if (hofId) {
+      await axios.post(`http://localhost:8000/api/head-of-families/${hofId}?_method=PUT`, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+    } else {
+      // fallback: buat baru jika tidak ada
+      await axios.post("http://localhost:8000/api/head-of-families", formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+    }
 
     alert("Data kepala rumah berhasil disimpan!");
   } catch (error) {
-    console.error(error);
-    alert("Gagal menyimpan data.");
+    console.error("Error saat register:", error.response?.data || error);
   }
 }
 </script>
 
 <style scoped>
-@reference "../style.css";
+@reference "tailwindcss";
 
 .input {
   @apply w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none;

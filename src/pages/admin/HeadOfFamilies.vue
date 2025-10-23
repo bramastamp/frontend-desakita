@@ -109,38 +109,35 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+import { ref, computed, onMounted } from 'vue'
 
-// Data dummy sementara (nanti diganti API)
-const families = ref([
-  {
-    name: 'Budi',
-    nik: '3060283182',
-    birthdate: '11 April 1945',
-    gender: 'Laki-Laki',
-    phone: '+62 821-2211-7492',
-    address: 'Jl. Sudirman No.321, Pati, 97219',
-    profession: 'Engineering',
-    members: 3,
-    photo: '/default-avatar.jpg'
-  },
-  {
-    name: 'Siti Aminah',
-    nik: '3060283183',
-    birthdate: '5 Mei 1982',
-    gender: 'Perempuan',
-    phone: '+62 812-3333-1111',
-    address: 'Jl. Diponegoro No.5, Kudus',
-    profession: 'Guru',
-    members: 4,
-    photo: '/default-avatar.jpg'
-  },
-])
+const router = useRouter()
 
+const families = ref([])
 const searchQuery = ref('')
 const entriesPerPage = ref(10)
 const page = ref(1)
 const filterOpen = ref(false)
+
+onMounted(async () => {
+  await fetchFamilies()
+})
+
+async function fetchFamilies() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.get("http://localhost:8000/api/head-of-families", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    families.value = response.data.data || response.data; // sesuaikan struktur respons
+  } catch (error) {
+    console.error('Gagal mengambil data kepala keluarga:', error);
+  }
+}
 
 const filteredFamilies = computed(() => {
   if (!searchQuery.value) return families.value
@@ -162,7 +159,7 @@ function prevPage() {
 }
 
 function openAddModal() {
-  alert('Form tambah kepala rumah akan dibuat setelah ini 😊')
+  router.push('/admin/head-families/add')
 }
 
 function manageFamily(family) {

@@ -117,6 +117,7 @@ const login = async () => {
     const { token, user } = res.data
     localStorage.setItem('token', token)
     localStorage.setItem('role', user.role)
+    localStorage.setItem('name', user.name)
 
     // Simulasi sedikit delay biar animasi loading kelihatan
     setTimeout(() => {

@@ -16,11 +16,13 @@ import SocialAidsList from '../pages/admin/socialAids/SocialAidsList.vue';
 import SocialAidsApplications from '../pages/admin/socialAids/SocialAidsApplications.vue';
 import Developments from '../pages/admin/Developments.vue';
 import Events from '../pages/admin/Events.vue';
+import VillageProfile from '../pages/admin/VillageProfile.vue'
 
 // User pages
 import UserDashboard from '../pages/user/Dashboard.vue';
 import MyResidents from '../pages/user/MyResidents.vue';
 import MyAids from '../pages/user/MyAids.vue';
+import HeadOfFamiliesAdd from '../pages/admin/HeadOfFamiliesAdd.vue';
 
 const routes = [
   { path: '/login', component: Login },
@@ -32,9 +34,11 @@ const routes = [
     children: [
       { path: 'dashboard', component: AdminDashboard },
       { path: 'head-families', component: HeadFamilies },
+      { path: 'head-families/add', component: HeadOfFamiliesAdd },
       { path: 'residents', component: Residents },
       { path: 'developments', component: Developments },
       { path: 'events', component: Events },
+      { path: 'village-profile', component: VillageProfile },
 
       {
         path: 'social-aids',
@@ -46,7 +50,7 @@ const routes = [
       },
     ],
   },
-  
+
   {
     path: '/user',
     component: UserLayout,
@@ -54,6 +58,7 @@ const routes = [
       { path: 'dashboard', component: UserDashboard },
       { path: 'my-residents', component: MyResidents },
       { path: 'my-aids', component: MyAids },
+      { path: 'village-profile', component: VillageProfile },
     ],
   },
 ];

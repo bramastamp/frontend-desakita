@@ -51,7 +51,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { Home, Users, Gift, Calendar, Building2 } from 'lucide-vue-next'
+import { Home, Users, Gift, Calendar, Building2, Map } from 'lucide-vue-next'
 
 const route = useRoute()
 const openSubmenu = ref(null)
@@ -73,6 +73,7 @@ const menuItems = [
   },
   { name: 'Pembangunan', route: '/admin/developments', icon: Building2 },
   { name: 'Acara', route: '/admin/events', icon: Calendar },
+  { name: 'Profil Desa', route: '/admin/village-profile', icon: Map },
 ]
 
 const isActive = (path) => route.path === path

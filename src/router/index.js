@@ -12,7 +12,8 @@ import Register from '../pages/auth/Register.vue';
 import AdminDashboard from '../pages/admin/Dashboard.vue';
 import HeadFamilies from '../pages/admin/HeadOfFamilies.vue';
 import Residents from '../pages/admin/Residents.vue';
-import SocialAids from '../pages/admin/SocialAids.vue';
+import SocialAidsList from '../pages/admin/socialAids/SocialAidsList.vue';
+import SocialAidsApplications from '../pages/admin/socialAids/SocialAidsApplications.vue';
 import Developments from '../pages/admin/Developments.vue';
 import Events from '../pages/admin/Events.vue';
 
@@ -32,11 +33,20 @@ const routes = [
       { path: 'dashboard', component: AdminDashboard },
       { path: 'head-families', component: HeadFamilies },
       { path: 'residents', component: Residents },
-      { path: 'social-aids', component: SocialAids },
       { path: 'developments', component: Developments },
       { path: 'events', component: Events },
+
+      {
+        path: 'social-aids',
+        children: [
+          { path: 'list', component: SocialAidsList },
+          { path: 'applications', component: SocialAidsApplications },
+          { path: '', redirect: '/admin/social-aids/list' }, // default route
+        ],
+      },
     ],
   },
+  
   {
     path: '/user',
     component: UserLayout,
@@ -54,23 +64,22 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
-  const role = localStorage.getItem('role')
+  const token = localStorage.getItem('token');
+  const role = localStorage.getItem('role');
 
   if (!token && to.path !== '/login' && to.path !== '/register') {
-    return next('/login')
+    return next('/login');
   }
 
   if (to.path.startsWith('/admin') && role !== 'admin') {
-    return next('/user/dashboard')
+    return next('/user/dashboard');
   }
 
   if (to.path.startsWith('/user') && role !== 'user') {
-    return next('/admin/dashboard')
+    return next('/admin/dashboard');
   }
 
-  next()
-})
-
+  next();
+});
 
 export default router;

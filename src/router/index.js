@@ -23,6 +23,7 @@ import UserDashboard from '../pages/user/Dashboard.vue';
 import MyResidents from '../pages/user/MyResidents.vue';
 import MyAids from '../pages/user/MyAids.vue';
 import HeadOfFamiliesAdd from '../pages/admin/HeadOfFamiliesAdd.vue';
+import HeadOfFamiliesEdit from '../pages/admin/HeadOfFamiliesEdit.vue';
 
 const routes = [
   { path: '/login', component: Login },
@@ -35,6 +36,7 @@ const routes = [
       { path: 'dashboard', component: AdminDashboard },
       { path: 'head-families', component: HeadFamilies },
       { path: 'head-families/add', component: HeadOfFamiliesAdd },
+      { path: 'head-families/edit/:id', component: HeadOfFamiliesEdit },
       { path: 'residents', component: Residents },
       { path: 'developments', component: Developments },
       { path: 'events', component: Events },

@@ -1,16 +1,15 @@
 <template>
   <div class="p-6 bg-green-50 min-h-screen">
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">Pembangunan Desa</h1>
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Acara Desa</h1>
 
     <!-- Search -->
     <div class="flex flex-wrap justify-between items-center bg-white p-4 rounded-lg mb-6 shadow-sm">
       <input
         type="text"
         v-model="searchQuery"
-        placeholder="Cari Pembangunan Desa"
+        placeholder="Cari Acara Desa..."
         class="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
       />
-
       <div class="flex items-center gap-2 bg-green-50 border border-gray-200 px-3 py-2 rounded-lg mt-3 md:mt-0">
         <span class="text-sm text-gray-600">Show</span>
         <select v-model="entriesPerPage" class="border-none focus:ring-0 bg-green-50">
@@ -19,10 +18,10 @@
       </div>
     </div>
 
-    <!-- Daftar Pembangunan -->
+    <!-- Daftar Acara -->
     <div
-      v-for="(dev, index) in paginatedDevelopments"
-      :key="index"
+      v-for="(event, index) in paginatedEvents"
+      :key="event.id"
       class="bg-white p-5 mb-4 rounded-2xl shadow-md hover:shadow-lg transition cursor-pointer"
       @click="toggleExpand(index)"
     >
@@ -30,20 +29,21 @@
         <!-- Kiri -->
         <div class="flex items-center gap-4">
           <img
-            :src="dev.photo_url || 'https://via.placeholder.com/100x80?text=No+Image'"
-            alt="Foto"
+            :src="event.event_photo || 'https://via.placeholder.com/100x80?text=No+Image'"
+            alt="Foto Event"
             class="w-24 h-20 object-cover rounded-lg border"
           />
           <div>
-            <h2 class="text-lg font-semibold text-gray-800">{{ dev.title }}</h2>
+            <h2 class="text-lg font-semibold text-gray-800">{{ event.title }}</h2>
             <p class="text-sm text-gray-600 flex items-center gap-1 mb-1">
               <i class="fa fa-user"></i> Penanggung Jawab:
-              <span class="font-semibold">{{ dev.pic }}</span>
+              <span class="font-semibold">{{ event.pic }}</span>
             </p>
+
             <p class="text-sm text-gray-700">
-              {{ getShortDescription(dev.description, index) }}
+              {{ getShortDescription(event.description, index) }}
               <button
-                v-if="dev.description && dev.description.length > 120"
+                v-if="event.description && event.description.length > 120"
                 @click.stop="toggleDescription(index)"
                 class="text-green-600 hover:underline ml-1 font-medium"
               >
@@ -56,19 +56,19 @@
 
       <!-- Detail (expandable) -->
       <transition name="fade">
-        <div v-if="expandedIndex === index" class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div v-if="expandedIndex === index" class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="flex items-center gap-3 bg-red-50 px-3 py-2 rounded-lg">
-            <i class="fa fa-wallet text-red-600 text-xl"></i>
+            <i class="fa fa-clock text-red-600 text-xl"></i>
             <div>
-              <p class="text-red-600 font-bold">Rp{{ formatCurrency(dev.budget) }}</p>
-              <p class="text-xs text-gray-600">Total Anggaran</p>
+              <p class="text-red-600 font-bold">{{ event.time }}</p>
+              <p class="text-xs text-gray-600">Waktu</p>
             </div>
           </div>
 
           <div class="flex items-center gap-3 bg-blue-50 px-3 py-2 rounded-lg">
             <i class="fa fa-location-dot text-blue-700 text-xl"></i>
             <div>
-              <p class="text-blue-700 font-semibold">{{ dev.location }}</p>
+              <p class="text-blue-700 font-semibold">{{ event.location }}</p>
               <p class="text-xs text-gray-600">Lokasi</p>
             </div>
           </div>
@@ -76,16 +76,8 @@
           <div class="flex items-center gap-3 bg-green-50 px-3 py-2 rounded-lg">
             <i class="fa fa-calendar text-green-700 text-xl"></i>
             <div>
-              <p class="text-green-800 font-semibold">{{ formatDate(dev.start_date) }}</p>
-              <p class="text-xs text-gray-600">Tanggal Mulai</p>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-3 bg-green-50 px-3 py-2 rounded-lg">
-            <i class="fa fa-calendar text-green-700 text-xl"></i>
-            <div>
-              <p class="text-green-800 font-semibold">{{ formatDate(dev.end_date) }}</p>
-              <p class="text-xs text-gray-600">Tenggat</p>
+              <p class="text-green-800 font-semibold">{{ formatDate(event.date) }}</p>
+              <p class="text-xs text-gray-600">Tanggal Pelaksanaan</p>
             </div>
           </div>
         </div>
@@ -94,24 +86,24 @@
 
     <!-- Pagination -->
     <div class="flex justify-between items-center mt-6 text-sm text-gray-500">
-      <span>Showing {{ startIndex + 1 }}–{{ endIndex }} of {{ filteredDevelopments.length }}</span>
+      <span>Showing {{ startIndex + 1 }}–{{ endIndex }} of {{ filteredEvents.length }}</span>
       <div class="flex gap-2">
-        <button
-          @click="prevPage"
-          :disabled="page === 1"
-          class="px-3 py-1 border rounded disabled:opacity-50"
-        >
+        <button @click="prevPage" :disabled="page === 1" class="px-3 py-1 border rounded disabled:opacity-50">
           Prev
         </button>
         <button
           @click="nextPage"
-          :disabled="endIndex >= filteredDevelopments.length"
+          :disabled="endIndex >= filteredEvents.length"
           class="px-3 py-1 border rounded disabled:opacity-50"
         >
           Next
         </button>
       </div>
     </div>
+
+    <p v-if="filteredEvents.length === 0" class="text-center text-gray-500 mt-10">
+      Tidak ada acara ditemukan.
+    </p>
   </div>
 </template>
 
@@ -119,30 +111,32 @@
 import { ref, computed, onMounted, watch } from "vue"
 import axios from "axios"
 
-const developments = ref([])
+const BASE_URL = "http://127.0.0.1:8000"
+const events = ref([])
 const searchQuery = ref("")
 const debouncedQuery = ref("")
 const entriesPerPage = ref(10)
 const page = ref(1)
-const BASE_URL = "http://127.0.0.1:8000"
+const expandedIndex = ref(null)
+const expandedDescriptions = ref({})
 
-// 🔹 Ambil data
-onMounted(fetchDevelopments)
-async function fetchDevelopments() {
+// Ambil data acara publik
+onMounted(fetchEvents)
+async function fetchEvents() {
   try {
-    const response = await axios.get(`${BASE_URL}/api/public/developments`)
-    developments.value = response.data
+    const res = await axios.get(`${BASE_URL}/api/public/events`)
+    events.value = res.data
   } catch (err) {
-    console.error("Gagal mengambil data pembangunan:", err)
+    console.error("Gagal memuat data acara:", err)
   }
 }
 
-// 🔹 Expand & deskripsi
-const expandedIndex = ref(null)
+// Expand/Collapse card
 function toggleExpand(index) {
   expandedIndex.value = expandedIndex.value === index ? null : index
 }
-const expandedDescriptions = ref({})
+
+// Read more
 function toggleDescription(index) {
   expandedDescriptions.value[index] = !expandedDescriptions.value[index]
 }
@@ -154,42 +148,38 @@ function getShortDescription(desc, index) {
   return expanded ? desc : desc.slice(0, limit) + "..."
 }
 
-// 🔹 Pencarian & pagination
+// Debounce pencarian
 let debounceTimer
 watch(searchQuery, (newQuery) => {
   clearTimeout(debounceTimer)
-  debounceTimer = setTimeout(() => {
-    debouncedQuery.value = newQuery
-  }, 400)
+  debounceTimer = setTimeout(() => (debouncedQuery.value = newQuery), 400)
 })
-const filteredDevelopments = computed(() => {
+
+// Filter dan pagination
+const filteredEvents = computed(() => {
   const q = debouncedQuery.value.toLowerCase()
-  return developments.value.filter(
-    (d) =>
-      d.title.toLowerCase().includes(q) ||
-      d.pic.toLowerCase().includes(q) ||
-      d.location.toLowerCase().includes(q)
+  return events.value.filter(
+    (e) =>
+      e.title.toLowerCase().includes(q) ||
+      e.pic.toLowerCase().includes(q) ||
+      e.location.toLowerCase().includes(q)
   )
 })
 const startIndex = computed(() => (page.value - 1) * entriesPerPage.value)
 const endIndex = computed(() =>
-  Math.min(startIndex.value + entriesPerPage.value, filteredDevelopments.value.length)
+  Math.min(startIndex.value + entriesPerPage.value, filteredEvents.value.length)
 )
-const paginatedDevelopments = computed(() =>
-  filteredDevelopments.value.slice(startIndex.value, endIndex.value)
+const paginatedEvents = computed(() =>
+  filteredEvents.value.slice(startIndex.value, endIndex.value)
 )
 function nextPage() {
-  if (endIndex.value < filteredDevelopments.value.length) page.value++
+  if (endIndex.value < filteredEvents.value.length) page.value++
 }
 function prevPage() {
   if (page.value > 1) page.value--
 }
 
-// 🔹 Formatter
-function formatCurrency(amount) {
-  if (!amount) return "0"
-  return new Intl.NumberFormat("id-ID").format(amount)
-}
+// Format tanggal
 function formatDate(dateString) {
   if (!dateString) return "-"
   const date = new Date(dateString)

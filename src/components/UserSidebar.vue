@@ -11,8 +11,9 @@
           <div v-if="item.children">
             <!-- Parent item -->
             <button
-              @click="toggleSubmenu(item.name)"
+              @click="handleParentClick(item)"
               class="flex items-center w-full px-6 py-3 text-gray-700 hover:bg-green-100 rounded-md transition-colors"
+              :class="{ 'bg-green-100 font-semibold text-green-700': isParentActive(item) }"
             >
               <component :is="item.icon" class="w-5 h-5 mr-3" />
               {{ item.name }}
@@ -49,20 +50,39 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { Home, Users, Gift, Calendar, Building2, Map } from 'lucide-vue-next'
 
 const route = useRoute()
+const router = useRouter()
 const openSubmenu = ref(null)
 
-const toggleSubmenu = (name) => {
-  openSubmenu.value = openSubmenu.value === name ? null : name
+// buka submenu "Bantuan Sosial" kalau sedang di route terkait
+if (route.path.startsWith('/user/social-aids')) {
+  openSubmenu.value = 'Bantuan Sosial'
+}
+
+function handleParentClick(item) {
+  if (item.children && item.children.length > 0) {
+    if (openSubmenu.value === item.name) {
+      // Tutup submenu kalau sudah terbuka
+      openSubmenu.value = null
+    } else {
+      // Buka submenu dan arahkan ke route pertama
+      openSubmenu.value = item.name
+      router.push(item.children[0].route)
+    }
+  } else {
+    // Untuk menu biasa
+    openSubmenu.value = null
+    router.push(item.route)
+  }
 }
 
 const menuItems = [
   { name: 'Dashboard', route: '/user/dashboard', icon: Home },
-  { name: 'Anggota Keluarga', route: '/user/head-families', icon: Users },
+  { name: 'Anggota Keluarga', route: '/user/my-residents', icon: Users },
   {
     name: 'Bantuan Sosial',
     icon: Gift,
@@ -76,12 +96,28 @@ const menuItems = [
   { name: 'Profil Desa', route: '/user/village-profile', icon: Map },
 ]
 
+// untuk menandai menu aktif
 const isActive = (path) => route.path === path
+
+// untuk menandai parent aktif jika salah satu child aktif
+const isParentActive = (parent) => {
+  if (!parent.children) return false
+  return parent.children.some(child => route.path.startsWith(child.route))
+}
+
+// tutup submenu ketika keluar dari submenu tersebut
+watch(
+  () => route.path,
+  (newPath) => {
+    if (!newPath.startsWith('/user/social-aids')) {
+      openSubmenu.value = null
+    }
+  }
+)
 </script>
 
-
 <style scoped>
-@reference "../style.css";
+@reference "tailwindcss";
 
 .router-link-active {
   @apply bg-green-100 text-green-700 font-semibold;

@@ -171,24 +171,26 @@ onMounted(fetchFamilies)
 
 async function fetchFamilies() {
   try {
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token");
     const response = await axios.get(`${BASE_URL}/api/head-of-families`, {
       headers: { Authorization: `Bearer ${token}` },
-    })
+    });
+
     families.value = response.data.map(f => ({
       id: f.id,
-      name: f.user.name,
+      name: f.user?.name || 'Tidak ada nama',
       nik: f.nik,
       photo: f.profile_picture ? `${BASE_URL}/storage/${f.profile_picture}` : null,
       gender: f.gender === 'male' ? 'Laki-laki' : 'Perempuan',
-      birthdate: f.date_of_birth ? f.date_of_birth.split('T')[0] : null,
+      birthdate: f.date_of_birth ? f.date_of_birth.split('T')[0] : '-',
       phone: f.phone_number,
       address: f.address,
       profession: f.occupation,
-      members: f.residents ? f.residents.length : 0,
-    }))
+      // ✅ Gunakan salah satu:
+      members: f.residents ? f.residents.length : f.residents_count || 0,
+    }));
   } catch (error) {
-    console.error("Gagal mengambil data kepala keluarga:", error)
+    console.error("Gagal mengambil data kepala keluarga:", error);
   }
 }
 

@@ -27,7 +27,10 @@ import VillageProfile from '../pages/admin/VillageProfile.vue'
 // User pages
 import UserDashboard from '../pages/user/Dashboard.vue';
 import MyResidents from '../pages/user/MyResidents.vue';
-import MyAids from '../pages/user/MyAids.vue';
+import MyResidentsAdd from '../pages/user/AddMyResident.vue';
+import MyResidentsEdit from '../pages/user/EditMyResident.vue';
+import UserDevelopments from '../pages/user/Developments.vue';
+import UserEvents from '../pages/user/Events.vue';
 
 const routes = [
   { path: '/login', component: Login },
@@ -67,8 +70,20 @@ const routes = [
     children: [
       { path: 'dashboard', component: UserDashboard },
       { path: 'my-residents', component: MyResidents },
-      { path: 'my-aids', component: MyAids },
+      { path: 'my-residents/add', component: MyResidentsAdd },
+      { path: 'my-residents/edit/:id', component: MyResidentsEdit },
+      { path: 'developments', component: UserDevelopments },
+      { path: 'events', component: UserEvents },
       { path: 'village-profile', component: VillageProfile },
+
+      {
+        path: 'social-aids',
+        children: [
+          { path: 'list', component: SocialAidsList },
+          { path: 'applications', component: SocialAidsApplications },
+          { path: '', redirect: '/admin/social-aids/list' }, // default route
+        ],
+      },
     ],
   },
 ];

@@ -79,13 +79,23 @@
         <span class="text-blue-600 text-sm font-medium cursor-pointer hover:underline">
           👪 {{ family.members }} Anggota Keluarga
         </span>
-        <button
-          @click="router.push(`/admin/head-families/edit/${family.id}`)"
-          class="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2 rounded-lg"
-        >
-          Manage
-        </button>
+        <div class="flex gap-2">
+          <button
+            @click="router.push(`/admin/head-of-families/edit/${family.id}`)"
+            class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          >
+            <i class="fa fa-edit"></i> Manage
+          </button>
+          <button
+            @click="deleteFamily(family.id)"
+            class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg flex items-center justify-center"
+            title="Hapus Kepala Rumah"
+          >
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
       </div>
+
     </div>
 
     <!-- Pagination -->
@@ -166,6 +176,24 @@ async function fetchFamilies() {
   }
 }
 
+async function deleteFamily(id) {
+  if (!confirm('Apakah Anda yakin ingin menghapus kepala rumah ini beserta akunnya?')) return
+
+  try {
+    const token = localStorage.getItem("token")
+    await axios.delete(`http://localhost:8000/api/head-of-families/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+
+    alert('Kepala rumah dan akun berhasil dihapus.')
+    await fetchFamilies() // refresh daftar
+  } catch (error) {
+    console.error("Gagal menghapus:", error)
+    alert("Terjadi kesalahan saat menghapus data.")
+  }
+}
+
+
 // 🔹 Gunakan debouncedQuery di sini, bukan searchQuery langsung
 const filteredFamilies = computed(() => {
   const query = debouncedQuery.value.toLowerCase()
@@ -187,7 +215,7 @@ function prevPage() {
 }
 
 function openAddModal() {
-  router.push('/admin/head-families/add')
+  router.push('/admin/head-of-families/add')
 }
 
 function manageFamily(family) {
@@ -197,5 +225,9 @@ function manageFamily(family) {
 </script>
 
 <style lang="scss" scoped>
+
+button i {
+  pointer-events: none;
+}
 
 </style>

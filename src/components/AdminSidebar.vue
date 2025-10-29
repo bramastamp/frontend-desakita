@@ -11,8 +11,9 @@
           <div v-if="item.children">
             <!-- Parent item -->
             <button
-              @click="toggleSubmenu(item.name)"
+              @click="handleParentClick(item)"
               class="flex items-center w-full px-6 py-3 text-gray-700 hover:bg-green-100 rounded-md transition-colors"
+              :class="{ 'bg-green-100 font-semibold text-green-700': isParentActive(item) }"
             >
               <component :is="item.icon" class="w-5 h-5 mr-3" />
               {{ item.name }}
@@ -51,18 +52,40 @@
 <script setup>
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { watch } from 'vue'
+
 import { Home, Users, Gift, Calendar, Building2, Map } from 'lucide-vue-next'
 
 const route = useRoute()
+const router = useRouter()
 const openSubmenu = ref(null)
-
-const toggleSubmenu = (name) => {
-  openSubmenu.value = openSubmenu.value === name ? null : name
+if (route.path.startsWith('/admin/social-aids')) {
+  openSubmenu.value = 'Bantuan Sosial'
 }
+
+
+function handleParentClick(item) {
+  if (item.children && item.children.length > 0) {
+    if (openSubmenu.value === item.name) {
+      // jika sudah terbuka, tutup
+      openSubmenu.value = null
+    } else {
+      // buka submenu dan langsung ke route pertama
+      openSubmenu.value = item.name
+      router.push(item.children[0].route)
+    }
+  } else {
+    // kalau item biasa
+    openSubmenu.value = null // pastikan submenu lain tertutup
+    router.push(item.route)
+  }
+}
+
 
 const menuItems = [
   { name: 'Dashboard', route: '/admin/dashboard', icon: Home },
-  { name: 'Kepala Rumah', route: '/admin/head-families', icon: Users },
+  { name: 'Kepala Rumah', route: '/admin/head-of-families', icon: Users },
   {
     name: 'Bantuan Sosial',
     icon: Gift,
@@ -77,6 +100,21 @@ const menuItems = [
 ]
 
 const isActive = (path) => route.path === path
+
+const isParentActive = (parent) => {
+  if (!parent.children) return false
+  return parent.children.some(child => route.path.startsWith(child.route))
+}
+
+watch(
+  () => route.path,
+  (newPath) => {
+    if (!newPath.startsWith('/admin/social-aids')) {
+      openSubmenu.value = null
+    }
+  }
+)
+
 </script>
 
 

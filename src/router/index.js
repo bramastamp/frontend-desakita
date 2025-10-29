@@ -11,10 +11,14 @@ import Register from '../pages/auth/Register.vue';
 // Admin pages
 import AdminDashboard from '../pages/admin/Dashboard.vue';
 import HeadOfFamilies from '../pages/admin/HeadOfFamilies.vue';
+import HeadOfFamiliesAdd from '../pages/admin/AddHeadOfFamily.vue';
+import HeadOfFamiliesEdit from '../pages/admin/EditHeadOfFamily.vue';
 import Residents from '../pages/admin/Residents.vue';
 import SocialAidsList from '../pages/admin/socialAids/SocialAidsList.vue';
 import SocialAidsApplications from '../pages/admin/socialAids/SocialAidsApplications.vue';
 import Developments from '../pages/admin/Developments.vue';
+import DevelopmentsAdd from '../pages/admin/AddDevelopments.vue';
+import DevelopmentsEdit from '../pages/admin/EditDevelopment.vue';
 import Events from '../pages/admin/Events.vue';
 import VillageProfile from '../pages/admin/VillageProfile.vue'
 
@@ -22,8 +26,6 @@ import VillageProfile from '../pages/admin/VillageProfile.vue'
 import UserDashboard from '../pages/user/Dashboard.vue';
 import MyResidents from '../pages/user/MyResidents.vue';
 import MyAids from '../pages/user/MyAids.vue';
-import HeadOfFamiliesAdd from '../pages/admin/AddHeadOfFamily.vue';
-import HeadOfFamiliesEdit from '../pages/admin/EditHeadOfFamily.vue';
 
 const routes = [
   { path: '/login', component: Login },
@@ -39,6 +41,8 @@ const routes = [
       { path: 'head-of-families/edit/:id', component: HeadOfFamiliesEdit },
       { path: 'residents', component: Residents },
       { path: 'developments', component: Developments },
+      { path: 'developments/add', component: DevelopmentsAdd },
+      { path: 'developments/edit/:id', component: DevelopmentsEdit },
       { path: 'events', component: Events },
       { path: 'village-profile', component: VillageProfile },
 

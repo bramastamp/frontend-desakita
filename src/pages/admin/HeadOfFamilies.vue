@@ -1,93 +1,76 @@
 <template>
-  <div class="p-6 bg-gray-50 min-h-screen">
+  <div class="p-6 bg-green-50 min-h-screen">
     <!-- Title -->
     <h1 class="text-2xl font-bold text-gray-800 mb-6">Kepala Rumah</h1>
 
     <!-- Search & Controls -->
-    <div class="flex flex-wrap justify-between items-center bg-green-50 p-4 rounded-lg mb-6">
+    <div class="flex flex-wrap justify-between items-center bg-white p-4 rounded-lg mb-6 shadow-sm">
       <input
         type="text"
         v-model="searchQuery"
         placeholder="Cari NIK atau Nama Kepala Rumah"
         class="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
       />
+
       <div class="flex gap-3 mt-3 md:mt-0">
-        <div class="flex items-center gap-2 bg-white border border-gray-200 px-3 py-2 rounded-lg">
+        <div class="flex items-center gap-2 bg-green-50 border border-gray-200 px-3 py-2 rounded-lg">
           <span class="text-sm text-gray-600">Show</span>
-          <select v-model="entriesPerPage" class="border-none focus:ring-0">
+          <select v-model="entriesPerPage" class="border-none focus:ring-0 bg-green-50">
             <option v-for="n in [5,10,20,50]" :key="n" :value="n">{{ n }} Entries</option>
           </select>
         </div>
+
         <button
           @click="filterOpen = !filterOpen"
-          class="bg-white border border-gray-200 px-3 py-2 rounded-lg flex items-center gap-2"
+          class="bg-green-50 border border-gray-200 px-3 py-2 rounded-lg flex items-center gap-2"
         >
           <i class="fa fa-filter text-gray-600"></i>
           <span class="text-sm text-gray-600">Filter</span>
         </button>
+
         <button
           @click="openAddModal"
           class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
-          <i class="fa fa-plus"></i>
-          Tambah Baru
+          <i class="fa fa-plus"></i> Tambah Baru
         </button>
       </div>
     </div>
 
-    <!-- List -->
-    <div 
-      @click="selectedFamilyId = selectedFamilyId === family.id ? null : family.id"
+    <!-- List Kepala Rumah -->
+    <div
       v-for="(family, index) in paginatedFamilies"
       :key="index"
-        class="cursor-pointer bg-white p-5 mb-4 rounded-lg shadow-sm hover:shadow-md transition"
+      class="bg-white p-5 mb-4 rounded-2xl shadow-md hover:shadow-lg transition cursor-pointer"
+      @click="toggleExpand(index)"
     >
-      <div class="flex items-center gap-4 w-full md:w-2/3">
-        <img
-          :src="family.photo || 'https://via.placeholder.com/80'"
-          alt="Foto"
-          class="w-16 h-16 rounded-full object-cover"
-        />
-        <div>
-          <h2 class="text-lg font-semibold text-gray-800">{{ family.name }}</h2>
-          <p class="text-sm text-gray-500 flex items-center gap-1">
-            <i class="fa fa-briefcase"></i> {{ family.profession }}
-          </p>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-2">
-            <p class="text-sm text-gray-600 flex items-center gap-1">
-              <i class="fa fa-id-card"></i> NIK: {{ family.nik }}
+      <div class="flex justify-between items-center">
+        <!-- Kiri -->
+        <div class="flex items-center gap-4">
+          <img
+            :src="family.photo || 'https://via.placeholder.com/80'"
+            alt="Foto"
+            class="w-20 h-20 rounded-full object-cover border"
+          />
+          <div>
+            <h2 class="text-lg font-semibold text-gray-800">{{ family.name }}</h2>
+            <p class="text-sm text-gray-600 flex items-center gap-1 mb-1">
+              <i class="fa fa-briefcase"></i> {{ family.profession }}
             </p>
-            <div v-if="selectedFamilyId === family.id" class="grid ... mt-2">
-              <p class="text-sm text-gray-600 flex items-center gap-1">
-                <i class="fa fa-cake-candles"></i> {{ family.birthdate }}
-              </p>
-              <p class="text-sm text-gray-600 flex items-center gap-1">
-                <i class="fa fa-venus-mars"></i> {{ family.gender }}
-              </p>
-              <p class="text-sm text-gray-600 flex items-center gap-1">
-                <i class="fa fa-phone"></i> {{ family.phone }}
-              </p>
-              <p class="text-sm text-gray-600 flex items-center gap-1">
-                <i class="fa fa-location-dot"></i> {{ family.address }}
-              </p>
-            </div>
+            <p class="text-sm text-gray-700">NIK: {{ family.nik }}</p>
           </div>
         </div>
-      </div>
 
-      <div class="flex flex-col items-end gap-3 mt-4 md:mt-0">
-        <span class="text-blue-600 text-sm font-medium cursor-pointer hover:underline">
-          👪 {{ family.members }} Anggota Keluarga
-        </span>
+        <!-- Kanan -->
         <div class="flex gap-2">
           <button
-            @click="router.push(`/admin/head-of-families/edit/${family.id}`)"
-            class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+            @click.stop="router.push(`/admin/head-of-families/edit/${family.id}`)"
+            class="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2 rounded-lg flex items-center gap-2"
           >
-            <i class="fa fa-edit"></i> Manage
+            <i class="fa fa-edit"></i> Kelola
           </button>
           <button
-            @click="deleteFamily(family.id)"
+            @click.stop="deleteFamily(family.id)"
             class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg flex items-center justify-center"
             title="Hapus Kepala Rumah"
           >
@@ -96,6 +79,53 @@
         </div>
       </div>
 
+      <!-- Detail (expandable) -->
+      <transition name="fade">
+        <div
+          v-if="expandedIndex === index"
+          class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        >
+          <div class="flex items-center gap-3 bg-blue-50 px-3 py-2 rounded-lg">
+            <i class="fa fa-cake-candles text-blue-600 text-xl"></i>
+            <div>
+              <p class="text-blue-800 font-semibold">{{ family.birthdate || '-' }}</p>
+              <p class="text-xs text-gray-600">Tanggal Lahir</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 bg-pink-50 px-3 py-2 rounded-lg">
+            <i class="fa fa-venus-mars text-pink-600 text-xl"></i>
+            <div>
+              <p class="text-pink-800 font-semibold">{{ family.gender }}</p>
+              <p class="text-xs text-gray-600">Jenis Kelamin</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 bg-yellow-50 px-3 py-2 rounded-lg">
+            <i class="fa fa-phone text-yellow-600 text-xl"></i>
+            <div>
+              <p class="text-yellow-800 font-semibold">{{ family.phone || '-' }}</p>
+              <p class="text-xs text-gray-600">Nomor Telepon</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 bg-green-50 px-3 py-2 rounded-lg md:col-span-2">
+            <i class="fa fa-location-dot text-green-600 text-xl"></i>
+            <div>
+              <p class="text-green-800 font-semibold">{{ family.address || '-' }}</p>
+              <p class="text-xs text-gray-600">Alamat</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 bg-purple-50 px-3 py-2 rounded-lg">
+            <i class="fa fa-users text-purple-600 text-xl"></i>
+            <div>
+              <p class="text-purple-800 font-semibold">{{ family.members }} Anggota</p>
+              <p class="text-xs text-gray-600">Jumlah Keluarga</p>
+            </div>
+          </div>
+        </div>
+      </transition>
     </div>
 
     <!-- Pagination -->
@@ -127,40 +157,27 @@ import axios from 'axios'
 import { ref, computed, onMounted, watch } from 'vue'
 
 const router = useRouter()
-
 const families = ref([])
 const searchQuery = ref('')
-const debouncedQuery = ref('') // 👈 ini query dengan delay
+const debouncedQuery = ref('')
 const entriesPerPage = ref(10)
 const page = ref(1)
 const filterOpen = ref(false)
-const selectedFamilyId = ref(null)
+const expandedIndex = ref(null)
 const BASE_URL = "http://127.0.0.1:8000"
 
-// 🔹 Tambahkan watcher untuk debounce input pencarian
-let debounceTimer
-watch(searchQuery, (newQuery) => {
-  clearTimeout(debounceTimer)
-  debounceTimer = setTimeout(() => {
-    debouncedQuery.value = newQuery
-  }, 500) // delay 500ms (bisa ubah sesuai kebutuhan)
-})
-
-onMounted(async () => {
-  await fetchFamilies()
-})
+// 🔹 Ambil data
+onMounted(fetchFamilies)
 
 async function fetchFamilies() {
   try {
     const token = localStorage.getItem("token")
-    const response = await axios.get("http://localhost:8000/api/head-of-families", {
+    const response = await axios.get(`${BASE_URL}/api/head-of-families`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-
     families.value = response.data.map(f => ({
       id: f.id,
       name: f.user.name,
-      email: f.user.email,
       nik: f.nik,
       photo: f.profile_picture ? `${BASE_URL}/storage/${f.profile_picture}` : null,
       gender: f.gender === 'male' ? 'Laki-laki' : 'Perempuan',
@@ -168,7 +185,6 @@ async function fetchFamilies() {
       phone: f.phone_number,
       address: f.address,
       profession: f.occupation,
-      marital_status: f.marital_status,
       members: f.residents ? f.residents.length : 0,
     }))
   } catch (error) {
@@ -176,58 +192,59 @@ async function fetchFamilies() {
   }
 }
 
+// 🔹 Hapus data
 async function deleteFamily(id) {
   if (!confirm('Apakah Anda yakin ingin menghapus kepala rumah ini beserta akunnya?')) return
-
   try {
     const token = localStorage.getItem("token")
-    await axios.delete(`http://localhost:8000/api/head-of-families/${id}`, {
+    await axios.delete(`${BASE_URL}/api/head-of-families/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-
-    alert('Kepala rumah dan akun berhasil dihapus.')
-    await fetchFamilies() // refresh daftar
+    alert('✅ Kepala rumah berhasil dihapus.')
+    await fetchFamilies()
   } catch (error) {
     console.error("Gagal menghapus:", error)
-    alert("Terjadi kesalahan saat menghapus data.")
+    alert("❌ Terjadi kesalahan saat menghapus data.")
   }
 }
 
-
-// 🔹 Gunakan debouncedQuery di sini, bukan searchQuery langsung
-const filteredFamilies = computed(() => {
-  const query = debouncedQuery.value.toLowerCase()
-  return families.value.filter(f =>
-    f.name.toLowerCase().includes(query) ||
-    (f.nik && f.nik.includes(query))
-  )
+// 🔹 Search debounce
+let debounceTimer
+watch(searchQuery, (newQuery) => {
+  clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => {
+    debouncedQuery.value = newQuery
+  }, 400)
 })
 
+// 🔹 Filtering & pagination
+const filteredFamilies = computed(() => {
+  const q = debouncedQuery.value.toLowerCase()
+  return families.value.filter(
+    f => f.name.toLowerCase().includes(q) || (f.nik && f.nik.includes(q))
+  )
+})
 const startIndex = computed(() => (page.value - 1) * entriesPerPage.value)
 const endIndex = computed(() => Math.min(startIndex.value + entriesPerPage.value, filteredFamilies.value.length))
 const paginatedFamilies = computed(() => filteredFamilies.value.slice(startIndex.value, endIndex.value))
 
-function nextPage() {
-  if (endIndex.value < filteredFamilies.value.length) page.value++
-}
-function prevPage() {
-  if (page.value > 1) page.value--
-}
-
-function openAddModal() {
-  router.push('/admin/head-of-families/add')
-}
-
-function manageFamily(family) {
-  alert(`Manage data ${family.name}`)
-}
-
+function nextPage() { if (endIndex.value < filteredFamilies.value.length) page.value++ }
+function prevPage() { if (page.value > 1) page.value-- }
+function toggleExpand(index) { expandedIndex.value = expandedIndex.value === index ? null : index }
+function openAddModal() { router.push('/admin/head-of-families/add') }
 </script>
 
-<style lang="scss" scoped>
-
+<style scoped>
 button i {
   pointer-events: none;
 }
-
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
 </style>

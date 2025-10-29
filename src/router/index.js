@@ -20,6 +20,8 @@ import Developments from '../pages/admin/Developments.vue';
 import DevelopmentsAdd from '../pages/admin/AddDevelopments.vue';
 import DevelopmentsEdit from '../pages/admin/EditDevelopment.vue';
 import Events from '../pages/admin/Events.vue';
+import EventsAdd from '../pages/admin/AddEvent.vue';
+import EventsEdit from '../pages/admin/EditEvent.vue';
 import VillageProfile from '../pages/admin/VillageProfile.vue'
 
 // User pages
@@ -44,6 +46,8 @@ const routes = [
       { path: 'developments/add', component: DevelopmentsAdd },
       { path: 'developments/edit/:id', component: DevelopmentsEdit },
       { path: 'events', component: Events },
+      { path: 'events/add', component: EventsAdd },
+      { path: 'events/edit/:id', component: EventsEdit },
       { path: 'village-profile', component: VillageProfile },
 
       {

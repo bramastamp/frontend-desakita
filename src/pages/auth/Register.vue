@@ -1,147 +1,179 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-100 p-3">
-    <transition name="fade-slide" mode="out-in">
-      <div
-        key="register-page"
-        class="w-full max-w-5xl bg-white rounded-2xl overflow-hidden shadow-2xl grid md:grid-cols-2 h-[520px]"
-      >
-        <!-- Kiri - Form -->
-        <div class="pt-8 px-8 pb-6 flex flex-col justify-start">
-          <!-- Logo dan Judul -->
-          <div class="flex items-center justify-center gap-1 mb-2">
-            <img :src="logo" alt="DesaKito Logo" class="w-16" />
-            <h1 class="text-3xl font-bold text-gray-800">DesaKito.</h1>
+  <div
+    ref="container"
+    class="min-h-screen flex flex-col md:flex-row bg-gray-100 overflow-hidden relative"
+  >
+    <!-- LOGO -->
+    <div ref="logo" class="flex-1 flex items-center justify-center p-8 animate-logo-in">
+      <div class="text-center">
+        <img :src="logoImg" alt="DesaQ Logo" class="w-80 mx-auto mb-3" />
+        <h1 class="text-6xl font-extrabold text-teal-600">DesaQ</h1>
+      </div>
+    </div>
+
+    <!-- FORM REGISTER -->
+    <div ref="form" class="relative flex-1 flex items-center justify-center animate-form-in">
+      <div class="absolute inset-0 bg-teal-600 rounded-l-[6rem] md:rounded-l-[8rem]"></div>
+
+      <div class="relative z-10 w-full max-w-sm px-8 text-white">
+        <h2 class="text-3xl font-bold text-center mb-1">Haii, Selamat Datang!</h2>
+        <p class="text-teal-100 text-sm text-center mb-8">
+          Silahkan Daftar Terlebih Dahulu
+        </p>
+
+        <form @submit.prevent="register" class="space-y-5">
+          <div>
+            <label class="block text-white text-sm font-medium mb-1">Name</label>
+            <input
+              v-model="name"
+              type="text"
+              placeholder="Nama Lengkap"
+              class="w-full py-2 px-3 text-sm rounded-md bg-white/10 border border-white/30 text-white placeholder-teal-200 focus:ring-2 focus:ring-white"
+            />
           </div>
 
-          <h2 class="text-xl font-bold text-gray-800 text-center mb-1">
-            Haii, Selamat Datang!
-          </h2>
-          <p class="text-gray-500 text-sm text-center mb-6">
-            Silahkan Daftar Terlebih Dahulu
-          </p>
+          <div>
+            <label class="block text-white text-sm font-medium mb-1">Email Address</label>
+            <input
+              v-model="email"
+              type="email"
+              placeholder="Email"
+              class="w-full py-2 px-3 text-sm rounded-md bg-white/10 border border-white/30 text-white placeholder-teal-200 focus:ring-2 focus:ring-white"
+            />
+          </div>
 
-          <!-- Form Register -->
-          <form @submit.prevent="register" class="space-y-3 w-full max-w-sm mx-auto">
-            <div>
-              <label class="block text-gray-700 text-sm font-medium mb-1">Name</label>
-              <div class="relative">
-                <span class="absolute left-3 top-2.5 text-gray-400 text-sm">
-                  <i class="fa-regular fa-user"></i>
-                </span>
-                <input
-                  v-model="name"
-                  type="text"
-                  placeholder="Nama Lengkap"
-                  class="w-full pl-9 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-              </div>
-            </div>
+          <div>
+            <label class="block text-white text-sm font-medium mb-1">Password</label>
+            <input
+              v-model="password"
+              type="password"
+              placeholder="Password"
+              class="w-full py-2 px-3 text-sm rounded-md bg-white/10 border border-white/30 text-white placeholder-teal-200 focus:ring-2 focus:ring-white"
+            />
+          </div>
 
-            <div>
-              <label class="block text-gray-700 text-sm font-medium mb-1">Email Address</label>
-              <div class="relative">
-                <span class="absolute left-3 top-2.5 text-gray-400 text-sm">
-                  <i class="fa-regular fa-envelope"></i>
-                </span>
-                <input
-                  v-model="email"
-                  type="email"
-                  placeholder="Email"
-                  class="w-full pl-9 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-              </div>
-            </div>
+          <button
+            type="submit"
+            class="w-full bg-white text-teal-700 font-semibold py-3 rounded-md hover:bg-gray-100 transition-colors flex items-center justify-center"
+            :disabled="loading"
+          >
+            <span v-if="!loading">Daftar</span>
+            <span v-else class="flex items-center gap-2">
+              <i class="fa-solid fa-spinner fa-spin"></i> Memproses...
+            </span>
+          </button>
+        </form>
 
-            <div>
-              <label class="block text-gray-700 text-sm font-medium mb-1">Password</label>
-              <div class="relative">
-                <span class="absolute left-3 top-2.5 text-gray-400 text-sm">
-                  <i class="fa-solid fa-lock"></i>
-                </span>
-                <input
-                  v-model="password"
-                  type="password"
-                  placeholder="Password"
-                  class="w-full pl-9 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              class="w-full bg-teal-600 text-white text-sm font-medium py-3 rounded-lg hover:bg-teal-700 transition-colors flex items-center justify-center"
-              :disabled="loading"
-            >
-              <span v-if="!loading">Register</span>
-              <span v-else class="flex items-center gap-2">
-                <i class="fa-solid fa-spinner fa-spin"></i> Memproses...
-              </span>
-            </button>
-          </form>
-
-          <p class="text-center text-sm text-gray-600 mt-4">
-            Sudah punya akun?
-            <RouterLink
-              to="/login"
-              class="text-teal-600 font-medium hover:underline transition-all duration-300 hover:text-teal-700"
-            >
-              Login
-            </RouterLink>
-          </p>
-        </div>
-
-        <!-- Kanan - Gambar -->
-        <div class="hidden md:block">
-          <img
-            :src="landscape"
-            alt="Desa Pemandangan"
-            class="w-full h-full object-cover"
-          />
-        </div>
+        <p class="text-center text-sm text-white mt-5">
+          Sudah punya akun?
+          <span
+            @click="animateToLogin"
+            class="cursor-pointer font-semibold text-white underline hover:text-gray-200 transition-colors"
+          >
+            Login
+          </span>
+        </p>
       </div>
-    </transition>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import api from '../../api'
-import { useRouter, RouterLink } from 'vue-router'
+import { ref, nextTick, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import api from "../../api";
+import logoImg from "../../assets/logo desaq.png";
 
-// import logo & background
-import logo from '../../assets/logo.png'
-import landscape from '../../assets/landscape.jpg'
-
-const router = useRouter()
-
-const name = ref('')
-const email = ref('')
-const password = ref('')
-const role = ref('user')
-const loading = ref(false)
+const router = useRouter();
+const name = ref("");
+const email = ref("");
+const password = ref("");
+const loading = ref(false);
+const form = ref(null);
+const logo = ref(null);
 
 const register = async () => {
   try {
-    loading.value = true
-    // simulasi sedikit delay biar efek spinner kelihatan
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    await api.post('/register', {
-      name: name.value,
-      email: email.value,
-      password: password.value,
-      role: role.value
-    })
-    alert('Registrasi berhasil! Silakan login.')
-    router.push('/login')
-  } catch (err) {
-    console.error('Error detail:', err.response?.data)
-    alert('Registrasi gagal! Periksa data yang kamu masukkan.')
+    loading.value = true;
+    await api.post("/register", { name: name.value, email: email.value, password: password.value });
+    alert("Registrasi berhasil! Silakan login.");
+    router.push("/login");
+  } catch {
+    alert("Registrasi gagal! Periksa data yang kamu masukkan.");
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
+
+// 🌈 Animasi keluar ke login (smooth + cinematic)
+const animateToLogin = async () => {
+  await nextTick();
+  const f = form.value;
+  const l = logo.value;
+  f.classList.remove("animate-form-in");
+  l.classList.remove("animate-logo-in");
+
+  f.style.transition = l.style.transition = "none";
+  f.style.transform = "translateX(0) rotateY(0) translateZ(0)";
+  l.style.transform = "translateX(0) rotateY(0) translateZ(0)";
+  f.style.opacity = l.style.opacity = "1";
+  document.body.style.backdropFilter = "blur(0px)";
+  document.body.style.transition = "backdrop-filter 0.6s ease";
+
+  requestAnimationFrame(() => {
+    f.style.transition = l.style.transition =
+      "transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.6s ease";
+    f.style.transform = "translateX(70%) rotateY(10deg) translateZ(-40px)";
+    l.style.transform = "translateX(-70%) rotateY(-10deg) translateZ(-40px)";
+    f.style.opacity = l.style.opacity = "0";
+    document.body.style.backdropFilter = "blur(8px) brightness(0.8)";
+    setTimeout(() => router.push("/login"), 600);
+  });
+};
+
+// 🌟 Animasi masuk cinematic
+onMounted(() => {
+  const f = form.value;
+  const l = logo.value;
+  document.body.style.backdropFilter = "blur(8px) brightness(0.8)";
+  requestAnimationFrame(() => {
+    f.classList.add("animate-form-in");
+    l.classList.add("animate-logo-in");
+    document.body.style.backdropFilter = "blur(0px) brightness(1)";
+  });
+});
 </script>
 
 <style scoped>
-
+@keyframes logoIn {
+  from {
+    transform: translateX(-60%) rotateY(-10deg) translateZ(-40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) rotateY(0) translateZ(0);
+    opacity: 1;
+  }
+}
+@keyframes formIn {
+  from {
+    transform: translateX(60%) rotateY(10deg) translateZ(-40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) rotateY(0) translateZ(0);
+    opacity: 1;
+  }
+}
+.animate-logo-in {
+  animation: logoIn 0.7s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+.animate-form-in {
+  animation: formIn 0.7s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
 </style>
+
+
+
+
+

@@ -1,21 +1,29 @@
 <template>
-  <aside class="w-64 min-h-screen bg-white border-r">
+  <aside class="w-64 min-h-screen bg-white border-r border-gray-100">
     <div class="p-6 flex items-center space-x-2">
       <img src="" alt="Logo" class="w-8 h-8" />
       <h1 class="text-xl font-semibold text-gray-800">Desa Kito.</h1>
     </div>
 
     <nav class="mt-6">
-      <ul>
+      <ul class="space-y-1">
         <li v-for="item in menuItems" :key="item.name">
           <div v-if="item.children">
             <!-- Parent item -->
             <button
               @click="handleParentClick(item)"
-              class="flex items-center w-full px-6 py-3 text-gray-700 hover:bg-green-100 rounded-md transition-colors"
-              :class="{ 'bg-green-100 font-semibold text-green-700': isParentActive(item) }"
+              class="flex items-center px-4 py-3 mx-3 w-[calc(100%-1.5rem)] rounded-lg transition-all duration-200"
+              :class="[
+                isParentActive(item)
+                  ? 'bg-teal-100 text-teal-800 font-semibold cursor-default'
+                  : 'text-gray-700 hover:bg-teal-50',
+              ]"
             >
-              <component :is="item.icon" class="w-5 h-5 mr-3" />
+              <component
+                :is="item.icon"
+                class="w-5 h-5 mr-3"
+                :class="isParentActive(item) ? 'text-teal-800' : 'text-gray-700'"
+              />
               {{ item.name }}
             </button>
 
@@ -24,8 +32,13 @@
               <li v-for="child in item.children" :key="child.name">
                 <router-link
                   :to="child.route"
-                  class="block px-4 py-2 text-gray-600 hover:bg-green-50 rounded-md"
-                  :class="{ 'bg-green-100 text-green-700 font-semibold': isActive(child.route) }"
+                  active-class="menu-active"
+                  class="block px-3 py-2 mx-3 rounded-md transition-all duration-200"
+                  :class="[
+                    isActive(child.route)
+                      ? 'bg-teal-100 text-teal-800 font-semibold cursor-default'
+                      : 'text-gray-600 hover:bg-teal-50',
+                  ]"
                 >
                   {{ child.name }}
                 </router-link>
@@ -37,10 +50,19 @@
           <router-link
             v-else
             :to="item.route"
-            class="flex items-center px-6 py-3 text-gray-700 hover:bg-green-100 rounded-md transition-colors"
-            :class="{ 'bg-green-100 font-semibold text-green-700': isActive(item.route) }"
+            active-class="menu-active"
+            class="flex items-center px-4 py-3 mx-3 w-[calc(100%-1.5rem)] rounded-lg transition-all duration-200"
+            :class="[
+              isActive(item.route)
+                ? 'bg-teal-100 text-teal-800 font-semibold cursor-default'
+                : 'text-gray-700 hover:bg-teal-50',
+            ]"
           >
-            <component :is="item.icon" class="w-5 h-5 mr-3" />
+            <component
+              :is="item.icon"
+              class="w-5 h-5 mr-3"
+              :class="isActive(item.route) ? 'text-teal-800' : 'text-gray-700'"
+            />
             {{ item.name }}
           </router-link>
         </li>
@@ -58,23 +80,16 @@ const route = useRoute()
 const router = useRouter()
 const openSubmenu = ref(null)
 
-// buka submenu "Bantuan Sosial" kalau sedang di route terkait
+// otomatis buka submenu "Bantuan Sosial" kalau sedang di route terkait
 if (route.path.startsWith('/user/social-aids')) {
   openSubmenu.value = 'Bantuan Sosial'
 }
 
 function handleParentClick(item) {
   if (item.children && item.children.length > 0) {
-    if (openSubmenu.value === item.name) {
-      // Tutup submenu kalau sudah terbuka
-      openSubmenu.value = null
-    } else {
-      // Buka submenu dan arahkan ke route pertama
-      openSubmenu.value = item.name
-      router.push(item.children[0].route)
-    }
+    openSubmenu.value = openSubmenu.value === item.name ? null : item.name
+    router.push(item.children[0].route)
   } else {
-    // Untuk menu biasa
     openSubmenu.value = null
     router.push(item.route)
   }
@@ -96,16 +111,14 @@ const menuItems = [
   { name: 'Profil Desa', route: '/user/village-profile', icon: Map },
 ]
 
-// untuk menandai menu aktif
+// fungsi untuk menandai item aktif
 const isActive = (path) => route.path === path
 
-// untuk menandai parent aktif jika salah satu child aktif
-const isParentActive = (parent) => {
-  if (!parent.children) return false
-  return parent.children.some(child => route.path.startsWith(child.route))
-}
+// parent aktif kalau salah satu anaknya aktif
+const isParentActive = (parent) =>
+  parent.children && parent.children.some((child) => route.path.startsWith(child.route))
 
-// tutup submenu ketika keluar dari submenu tersebut
+// tutup submenu ketika keluar dari route terkait
 watch(
   () => route.path,
   (newPath) => {
@@ -119,7 +132,11 @@ watch(
 <style scoped>
 @reference "tailwindcss";
 
-.router-link-active {
-  @apply bg-green-100 text-green-700 font-semibold;
+.menu-active {
+  @apply bg-teal-100 text-teal-800 font-semibold rounded-md transition-all duration-200;
+}
+
+.menu-active svg {
+  @apply text-teal-800;
 }
 </style>

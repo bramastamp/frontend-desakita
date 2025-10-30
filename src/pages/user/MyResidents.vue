@@ -59,7 +59,7 @@
             <img
               :src="resident.photo || 'https://via.placeholder.com/100x100?text=No+Image'"
               alt="Foto"
-              class="w-24 h-24 rounded-lg object-cover border"
+              class="w-24 h-24 rounded-lg object-cover"
             />
             <div>
               <h2 class="text-lg font-semibold text-gray-800">{{ resident.name }}</h2>

@@ -1,12 +1,19 @@
 <template>
   <div class="flex min-h-screen bg-gray-100">
-    <UserSidebar class="w-64 bg-white shadow-md" />
-    <div class="flex-1 flex flex-col">
+    <!-- Sidebar -->
+    <div class="fixed left-0 top-0 h-full w-64 bg-white shadow-md z-40">
+      <UserSidebar />
+    </div>
+
+    <!-- Main content -->
+    <div class="flex-1 flex flex-col ml-64">
       <!-- Topbar -->
-      <Navbar />
+      <div class="fixed top-0 left-64 right-0 z-30 bg-white shadow-md">
+        <Navbar />
+      </div>
 
       <!-- Page content -->
-      <main class="p-6 flex-1 overflow-auto">
+      <main class="mt-16 p-6 flex-1 overflow-y-auto h-[calc(100vh-4rem)]">
         <router-view :key="$route.fullPath" />
       </main>
     </div>
@@ -14,8 +21,8 @@
 </template>
 
 <script setup>
-import Navbar from '../components/Topbar.vue';
-import UserSidebar from '../components/UserSidebar.vue';
+import Navbar from '../components/Topbar.vue'
+import UserSidebar from '../components/UserSidebar.vue'
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

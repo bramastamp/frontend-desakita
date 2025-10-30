@@ -31,7 +31,7 @@
           <img
             :src="event.event_photo || 'https://via.placeholder.com/100x80?text=No+Image'"
             alt="Foto Event"
-            class="w-24 h-20 object-cover rounded-lg border"
+            class="w-24 h-20 object-cover rounded-lg"
           />
           <div>
             <h2 class="text-lg font-semibold text-gray-800">{{ event.title }}</h2>

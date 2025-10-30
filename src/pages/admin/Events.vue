@@ -17,13 +17,7 @@
             <option v-for="n in [5,10,20,50]" :key="n" :value="n">{{ n }} Entries</option>
           </select>
         </div>
-        <button
-          @click="filterOpen = !filterOpen"
-          class="bg-green-50 border border-gray-200 px-3 py-2 rounded-lg flex items-center gap-2"
-        >
-          <i class="fa fa-filter text-gray-600"></i>
-          <span class="text-sm text-gray-600">Filter</span>
-        </button>
+        
         <button
           @click="openAddPage"
           class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
@@ -34,8 +28,28 @@
       </div>
     </div>
 
-    <!-- Daftar Acara -->
+    <!-- 🔹 Loading State -->
+    <div v-if="loading" class="flex justify-center items-center py-20">
+      <div class="flex flex-col items-center text-gray-600">
+        <svg class="animate-spin h-8 w-8 text-green-500 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+        </svg>
+        <p class="text-sm">Memuat data acara desa...</p>
+      </div>
+    </div>
+
+    <!-- 🔹 Empty State -->
+    <div v-else-if="!events.length" class="text-center text-gray-500 py-20">
+      <i class="fa fa-calendar text-5xl text-gray-400 mb-4"></i>
+      <p class="text-lg font-medium">Belum ada acara desa</p>
+      <p class="text-sm text-gray-400">Tambahkan acara baru untuk memulai</p>
+    </div>
+
+    <!-- 🔹 Daftar Acara -->
     <div
+      v-else
       v-for="(event, index) in paginatedEvents"
       :key="event.id"
       class="bg-white p-5 mb-4 rounded-2xl shadow-md hover:shadow-lg transition cursor-pointer"
@@ -47,7 +61,7 @@
           <img
             :src="event.event_photo || 'https://via.placeholder.com/100x80?text=No+Image'"
             alt="Foto Event"
-            class="w-24 h-20 object-cover rounded-lg border"
+            class="w-24 h-20 object-cover rounded-lg"
           />
           <div>
             <h2 class="text-lg font-semibold text-gray-800">{{ event.title }}</h2>
@@ -69,7 +83,7 @@
           </div>
         </div>
 
-        <!-- Kanan (tombol kelola & hapus) -->
+        <!-- Kanan -->
         <div class="flex gap-2">
           <button
             @click.stop="router.push(`/admin/events/edit/${event.id}`)"
@@ -117,8 +131,11 @@
       </transition>
     </div>
 
-    <!-- Pagination -->
-    <div class="flex justify-between items-center mt-6 text-sm text-gray-500">
+    <!-- 🔹 Pagination -->
+    <div
+      v-if="!loading && events.length"
+      class="flex justify-between items-center mt-6 text-sm text-gray-500"
+    >
       <span>Showing {{ startIndex + 1 }}–{{ endIndex }} of {{ filteredEvents.length }}</span>
       <div class="flex gap-2">
         <button @click="prevPage" :disabled="page === 1" class="px-3 py-1 border rounded disabled:opacity-50">
@@ -144,21 +161,17 @@ import axios from "axios"
 const router = useRouter()
 const BASE_URL = "http://127.0.0.1:8000"
 const events = ref([])
+const loading = ref(true)
 const searchQuery = ref("")
 const debouncedQuery = ref("")
 const entriesPerPage = ref(10)
 const page = ref(1)
-const filterOpen = ref(false)
-
-// Expand state
 const expandedIndex = ref(null)
-function toggleExpand(index) {
-  expandedIndex.value = expandedIndex.value === index ? null : index
-}
 
-// Ambil data
+// 🔹 Ambil data
 onMounted(fetchEvents)
 async function fetchEvents() {
+  loading.value = true
   try {
     const token = localStorage.getItem("token")
     const res = await axios.get(`${BASE_URL}/api/events`, {
@@ -167,10 +180,12 @@ async function fetchEvents() {
     events.value = res.data
   } catch (err) {
     console.error("Gagal memuat data acara:", err)
+  } finally {
+    loading.value = false
   }
 }
 
-// Hapus event
+// 🔹 Hapus
 async function deleteEvent(id) {
   if (!confirm("Apakah Anda yakin ingin menghapus acara ini?")) return
   try {
@@ -179,14 +194,19 @@ async function deleteEvent(id) {
       headers: { Authorization: `Bearer ${token}` },
     })
     alert("✅ Acara berhasil dihapus.")
-    fetchEvents()
+    await fetchEvents()
   } catch (err) {
     console.error(err)
     alert("❌ Gagal menghapus acara!")
   }
 }
 
-// Read more
+// 🔹 Expand
+function toggleExpand(index) {
+  expandedIndex.value = expandedIndex.value === index ? null : index
+}
+
+// 🔹 Deskripsi (read more)
 const expandedDescriptions = ref({})
 function toggleDescription(index) {
   expandedDescriptions.value[index] = !expandedDescriptions.value[index]
@@ -195,11 +215,10 @@ function getShortDescription(desc, index) {
   if (!desc) return "-"
   const limit = 120
   const expanded = expandedDescriptions.value[index]
-  if (desc.length <= limit) return desc
-  return expanded ? desc : desc.slice(0, limit) + "..."
+  return expanded || desc.length <= limit ? desc : desc.slice(0, limit) + "..."
 }
 
-// Pencarian (debounce)
+// 🔹 Pencarian (debounce)
 let debounceTimer
 watch(searchQuery, (newQuery) => {
   clearTimeout(debounceTimer)
@@ -216,7 +235,7 @@ const filteredEvents = computed(() => {
   )
 })
 
-// Pagination
+// 🔹 Pagination
 const startIndex = computed(() => (page.value - 1) * entriesPerPage.value)
 const endIndex = computed(() =>
   Math.min(startIndex.value + entriesPerPage.value, filteredEvents.value.length)
@@ -231,10 +250,12 @@ function prevPage() {
   if (page.value > 1) page.value--
 }
 
+// 🔹 Tambah baru
 function openAddPage() {
   router.push("/admin/events/add")
 }
 
+// 🔹 Format tanggal
 function formatDate(dateString) {
   if (!dateString) return "-"
   const date = new Date(dateString)

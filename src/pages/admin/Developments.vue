@@ -17,13 +17,7 @@
             <option v-for="n in [5,10,20,50]" :key="n" :value="n">{{ n }} Entries</option>
           </select>
         </div>
-        <button
-          @click="filterOpen = !filterOpen"
-          class="bg-green-50 border border-gray-200 px-3 py-2 rounded-lg flex items-center gap-2"
-        >
-          <i class="fa fa-filter text-gray-600"></i>
-          <span class="text-sm text-gray-600">Filter</span>
-        </button>
+        
         <button
           @click="openAddPage"
           class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
@@ -34,8 +28,28 @@
       </div>
     </div>
 
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center items-center py-20">
+      <div class="flex flex-col items-center text-gray-600">
+        <svg class="animate-spin h-8 w-8 text-green-500 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+        </svg>
+        <p class="text-sm">Memuat data pembangunan desa...</p>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else-if="!developments.length" class="text-center text-gray-500 py-20">
+      <i class="fa fa-building text-5xl text-gray-400 mb-4"></i>
+      <p class="text-lg font-medium">Belum ada data pembangunan</p>
+      <p class="text-sm text-gray-400">Tambahkan data baru untuk memulai</p>
+    </div>
+
     <!-- Daftar Pembangunan -->
     <div
+      v-else
       v-for="(dev, index) in paginatedDevelopments"
       :key="index"
       class="bg-white p-5 mb-4 rounded-2xl shadow-md hover:shadow-lg transition cursor-pointer"
@@ -47,7 +61,8 @@
           <img
             :src="dev.photo_url || 'https://via.placeholder.com/100x80?text=No+Image'"
             alt="Foto"
-            class="w-24 h-20 object-cover rounded-lg border"
+            class="w-24 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition"
+            @click.stop="openImageModal(dev.photo_url || 'https://via.placeholder.com/100x80?text=No+Image')"
           />
           <div>
             <h2 class="text-lg font-semibold text-gray-800">{{ dev.title }}</h2>
@@ -127,7 +142,10 @@
     </div>
 
     <!-- Pagination -->
-    <div class="flex justify-between items-center mt-6 text-sm text-gray-500">
+    <div
+      v-if="!loading && developments.length"
+      class="flex justify-between items-center mt-6 text-sm text-gray-500"
+    >
       <span>Showing {{ startIndex + 1 }}–{{ endIndex }} of {{ filteredDevelopments.length }}</span>
       <div class="flex gap-2">
         <button
@@ -147,6 +165,29 @@
       </div>
     </div>
   </div>
+
+  <!-- Popup Gambar -->
+  <transition name="fade">
+    <div
+      v-if="showImageModal"
+      class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+      @click="closeImageModal"
+    >
+      <div class="relative max-w-4xl w-full p-4" @click.stop>
+        <button
+          @click="closeImageModal"
+          class="absolute top-2 right-2 text-white bg-black bg-opacity-50 hover:bg-opacity-70 rounded-full p-2"
+        >
+          <i class="fa fa-times"></i>
+        </button>
+        <img
+          :src="selectedImage"
+          alt="Foto Pembangunan"
+          class="w-full max-h-[80vh] object-contain rounded-lg shadow-lg"
+        />
+      </div>
+    </div>
+  </transition>
 </template>
 
 <script setup>
@@ -156,17 +197,20 @@ import axios from "axios"
 
 const router = useRouter()
 const developments = ref([])
+const loading = ref(true) // ✅ Tambahkan loading state
 const searchQuery = ref("")
 const debouncedQuery = ref("")
 const entriesPerPage = ref(10)
 const page = ref(1)
 const filterOpen = ref(false)
 const BASE_URL = "http://127.0.0.1:8000"
+const showImageModal = ref(false)
+const selectedImage = ref(null)
 
-// 🔹 Fungsi ambil data
+// 🔹 Fetch Data
 onMounted(fetchDevelopments)
-
 async function fetchDevelopments() {
+  loading.value = true
   try {
     const token = localStorage.getItem("token")
     const response = await axios.get(`${BASE_URL}/api/developments`, {
@@ -175,10 +219,12 @@ async function fetchDevelopments() {
     developments.value = response.data
   } catch (err) {
     console.error("Gagal mengambil data pembangunan:", err)
+  } finally {
+    loading.value = false
   }
 }
 
-// 🔹 Fungsi hapus data pembangunan
+// 🔹 Delete
 async function deleteDevelopment(id) {
   if (!confirm("Apakah Anda yakin ingin menghapus data pembangunan ini?")) return
   try {
@@ -194,13 +240,13 @@ async function deleteDevelopment(id) {
   }
 }
 
-// 🔹 Expand card
+// 🔹 Expand logic
 const expandedIndex = ref(null)
 function toggleExpand(index) {
   expandedIndex.value = expandedIndex.value === index ? null : index
 }
 
-// 🔹 Read more
+// 🔹 Description toggle
 const expandedDescriptions = ref({})
 function toggleDescription(index) {
   expandedDescriptions.value[index] = !expandedDescriptions.value[index]
@@ -209,11 +255,10 @@ function getShortDescription(desc, index) {
   if (!desc) return "-"
   const limit = 120
   const expanded = expandedDescriptions.value[index]
-  if (desc.length <= limit) return desc
-  return expanded ? desc : desc.slice(0, limit) + "..."
+  return expanded || desc.length <= limit ? desc : desc.slice(0, limit) + "..."
 }
 
-// 🔹 Pencarian dengan debounce
+// 🔹 Search debounce
 let debounceTimer
 watch(searchQuery, (newQuery) => {
   clearTimeout(debounceTimer)
@@ -240,14 +285,12 @@ const endIndex = computed(() =>
 const paginatedDevelopments = computed(() =>
   filteredDevelopments.value.slice(startIndex.value, endIndex.value)
 )
-
 function nextPage() {
   if (endIndex.value < filteredDevelopments.value.length) page.value++
 }
 function prevPage() {
   if (page.value > 1) page.value--
 }
-
 function openAddPage() {
   router.push("/admin/developments/add")
 }
@@ -261,6 +304,16 @@ function formatDate(dateString) {
   if (!dateString) return "-"
   const date = new Date(dateString)
   return date.toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" })
+}
+
+// 🔹 Gambar Modal
+function openImageModal(imageUrl) {
+  selectedImage.value = imageUrl
+  showImageModal.value = true
+}
+function closeImageModal() {
+  showImageModal.value = false
+  selectedImage.value = null
 }
 </script>
 

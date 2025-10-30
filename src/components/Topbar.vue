@@ -1,5 +1,5 @@
 <template>
-  <header class="flex justify-between items-center px-6 py-4 bg-white border-b shadow-sm">
+  <header class="flex justify-between items-center px-6 py-4 bg-white">
     <!-- Kanan: Info Admin/User -->
     <div></div>
 

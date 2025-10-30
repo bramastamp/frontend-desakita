@@ -37,8 +37,28 @@
       </div>
     </div>
 
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center items-center py-20">
+      <div class="flex flex-col items-center text-gray-600">
+        <svg class="animate-spin h-8 w-8 text-green-500 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+        </svg>
+        <p class="text-sm">Memuat data kepala rumah...</p>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else-if="!families.length" class="text-center text-gray-500 py-20">
+      <i class="fa fa-user-slash text-5xl text-gray-400 mb-4"></i>
+      <p class="text-lg font-medium">Belum ada data kepala rumah</p>
+      <p class="text-sm text-gray-400">Tambahkan data baru untuk memulai</p>
+    </div>
+
     <!-- List Kepala Rumah -->
     <div
+      v-else
       v-for="(family, index) in paginatedFamilies"
       :key="index"
       class="bg-white p-5 mb-4 rounded-2xl shadow-md hover:shadow-lg transition cursor-pointer"
@@ -50,7 +70,7 @@
           <img
             :src="family.photo || 'https://via.placeholder.com/80'"
             alt="Foto"
-            class="w-20 h-20 rounded-full object-cover border"
+            class="w-20 h-20 rounded-full object-cover"
           />
           <div>
             <h2 class="text-lg font-semibold text-gray-800">{{ family.name }}</h2>
@@ -129,7 +149,10 @@
     </div>
 
     <!-- Pagination -->
-    <div class="flex justify-between items-center mt-6 text-sm text-gray-500">
+    <div
+      v-if="!loading && families.length"
+      class="flex justify-between items-center mt-6 text-sm text-gray-500"
+    >
       <span>Showing {{ startIndex + 1 }}–{{ endIndex }} of {{ filteredFamilies.length }}</span>
       <div class="flex gap-2">
         <button
@@ -158,6 +181,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 
 const router = useRouter()
 const families = ref([])
+const loading = ref(true) // ✅ Tambahkan state loading
 const searchQuery = ref('')
 const debouncedQuery = ref('')
 const entriesPerPage = ref(10)
@@ -170,6 +194,7 @@ const BASE_URL = "http://127.0.0.1:8000"
 onMounted(fetchFamilies)
 
 async function fetchFamilies() {
+  loading.value = true
   try {
     const token = localStorage.getItem("token");
     const response = await axios.get(`${BASE_URL}/api/head-of-families`, {
@@ -186,11 +211,12 @@ async function fetchFamilies() {
       phone: f.phone_number,
       address: f.address,
       profession: f.occupation,
-      // ✅ Gunakan salah satu:
       members: f.residents ? f.residents.length : f.residents_count || 0,
-    }));
+    }))
   } catch (error) {
-    console.error("Gagal mengambil data kepala keluarga:", error);
+    console.error("Gagal mengambil data kepala keluarga:", error)
+  } finally {
+    loading.value = false
   }
 }
 

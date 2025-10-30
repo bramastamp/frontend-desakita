@@ -45,27 +45,26 @@
       </h2>
 
       <!-- Daftar Anggota dalam Kelompok -->
-      <div
-        v-if="group.length"
-        class="grid md:grid-cols-2 lg:grid-cols-3 gap-4"
+      <div 
+        v-if="group.length" 
+        class="flex flex-col gap-4"
       >
         <div
           v-for="resident in group"
           :key="resident.id"
-          class="bg-white p-5 rounded-2xl shadow-md hover:shadow-lg transition"
+          class="bg-white p-5 mb-4 rounded-2xl shadow-md hover:shadow-lg transition flex flex-col md:flex-row justify-between items-start gap-4 cursor-pointer"
         >
-          <div class="flex items-center gap-4">
+          <!-- Kiri: Foto + Info -->
+          <div class="flex items-center gap-4 w-full md:w-3/4">
             <img
-              :src="resident.photo || 'https://via.placeholder.com/80'"
+              :src="resident.photo || 'https://via.placeholder.com/100x100?text=No+Image'"
               alt="Foto"
-              class="w-20 h-20 rounded-full object-cover border"
+              class="w-24 h-24 rounded-lg object-cover"
             />
             <div>
-              <h2 class="text-lg font-semibold text-gray-800">
-                {{ resident.name }}
-              </h2>
+              <h2 class="text-lg font-semibold text-gray-800">{{ resident.name }}</h2>
               <p class="text-sm text-gray-600 flex items-center gap-1 mb-1">
-                <i class="fa fa-briefcase"></i> {{ resident.occupation || '-' }}
+                <i class="fa fa-briefcase"></i> {{ resident.occupation || "-" }}
               </p>
               <div class="text-sm text-gray-700 flex flex-wrap gap-4">
                 <span class="flex items-center gap-1">
@@ -74,12 +73,15 @@
                 <span class="flex items-center gap-1">
                   <i class="fa fa-hourglass-half"></i> {{ resident.age }}
                 </span>
+                <span class="flex items-center gap-1">
+                  <i class="fa fa-users"></i> {{ resident.relation }}
+                </span>
               </div>
             </div>
           </div>
 
-          <!-- Tombol Aksi -->
-          <div class="flex justify-end gap-2 mt-4">
+          <!-- Kanan: Tombol Aksi -->
+          <div class="flex justify-end gap-2 w-full md:w-auto mt-2 md:mt-0">
             <button
               @click.stop="router.push(`/user/my-residents/edit/${resident.id}`)"
               class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm"

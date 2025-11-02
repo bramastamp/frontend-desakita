@@ -1,5 +1,5 @@
 <template>
-  <div class="flex min-h-screen bg-gray-100">
+  <div class="flex min-h-screen bg-blue-50">
     <!-- Sidebar -->
     <div class="fixed left-0 top-0 h-full w-64 bg-white z-40">
       <AdminSidebar />
@@ -26,4 +26,5 @@ import Topbar from '../components/Topbar.vue'
 </script>
 
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+</style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex min-h-screen bg-gray-100">
+  <div class="flex min-h-screen bg-blue-50">
     <!-- Sidebar -->
     <div class="fixed left-0 top-0 h-full w-64 bg-white shadow-md z-40">
       <UserSidebar />

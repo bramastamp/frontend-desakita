@@ -1,9 +1,9 @@
 <template>
-  <div class="p-6 bg-green-50 min-h-screen">
+  <div class="p-6 bg-blue-50 min-h-screen">
     <h1 class="text-2xl font-bold text-gray-800 mb-6">Pembangunan Desa</h1>
 
     <!-- Search -->
-    <div class="flex flex-wrap justify-between items-center bg-white p-4 rounded-lg mb-6 shadow-sm">
+    <div class="flex flex-wrap justify-between items-center bg-white p-4 rounded-lg mb-6">
       <input
         type="text"
         v-model="searchQuery"
@@ -23,7 +23,7 @@
     <div
       v-for="(dev, index) in paginatedDevelopments"
       :key="index"
-      class="bg-white p-5 mb-4 rounded-2xl shadow-md hover:shadow-lg transition cursor-pointer"
+      class="bg-white p-5 mb-4 rounded-2xl transition cursor-pointer"
       @click="toggleExpand(index)"
     >
       <div class="flex justify-between items-center">
@@ -32,7 +32,8 @@
           <img
             :src="dev.photo_url || 'https://via.placeholder.com/100x80?text=No+Image'"
             alt="Foto"
-            class="w-24 h-20 object-cover rounded-lg"
+            class="w-24 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition"
+            @click.stop="openImageModal(dev.photo_url || 'https://via.placeholder.com/100x80?text=No+Image')"
           />
           <div>
             <h2 class="text-lg font-semibold text-gray-800">{{ dev.title }}</h2>
@@ -113,6 +114,29 @@
       </div>
     </div>
   </div>
+
+  <!-- Popup Gambar -->
+  <transition name="fade">
+    <div
+      v-if="showImageModal"
+      class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+      @click="closeImageModal"
+    >
+      <div class="relative max-w-4xl w-full p-4" @click.stop>
+        <button
+          @click="closeImageModal"
+          class="absolute top-2 right-2 text-white bg-black bg-opacity-50 hover:bg-opacity-70 rounded-full p-2"
+        >
+          <i class="fa fa-times"></i>
+        </button>
+        <img
+          :src="selectedImage"
+          alt="Foto Pembangunan"
+          class="w-full max-h-[80vh] object-contain rounded-lg shadow-lg"
+        />
+      </div>
+    </div>
+  </transition>
 </template>
 
 <script setup>
@@ -125,6 +149,8 @@ const debouncedQuery = ref("")
 const entriesPerPage = ref(10)
 const page = ref(1)
 const BASE_URL = "http://127.0.0.1:8000"
+const showImageModal = ref(false)
+const selectedImage = ref(null)
 
 // 🔹 Ambil data
 onMounted(fetchDevelopments)
@@ -194,6 +220,16 @@ function formatDate(dateString) {
   if (!dateString) return "-"
   const date = new Date(dateString)
   return date.toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" })
+}
+
+// 🔹 Gambar Modal
+function openImageModal(imageUrl) {
+  selectedImage.value = imageUrl
+  showImageModal.value = true
+}
+function closeImageModal() {
+  showImageModal.value = false
+  selectedImage.value = null
 }
 </script>
 

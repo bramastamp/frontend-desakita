@@ -1,10 +1,10 @@
 <template>
-  <div class="p-6 bg-green-50 min-h-screen">
+  <div class="p-6 bg-blue-50 min-h-screen">
     <!-- Title -->
     <h1 class="text-2xl font-bold text-gray-800 mb-6">Kepala Rumah</h1>
 
     <!-- Search & Controls -->
-    <div class="flex flex-wrap justify-between items-center bg-white p-4 rounded-lg mb-6 shadow-sm">
+    <div class="flex flex-wrap justify-between items-center bg-white p-4 rounded-lg mb-6">
       <input
         type="text"
         v-model="searchQuery"
@@ -21,16 +21,8 @@
         </div>
 
         <button
-          @click="filterOpen = !filterOpen"
-          class="bg-green-50 border border-gray-200 px-3 py-2 rounded-lg flex items-center gap-2"
-        >
-          <i class="fa fa-filter text-gray-600"></i>
-          <span class="text-sm text-gray-600">Filter</span>
-        </button>
-
-        <button
           @click="openAddModal"
-          class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          class="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <i class="fa fa-plus"></i> Tambah Baru
         </button>
@@ -40,7 +32,7 @@
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-20">
       <div class="flex flex-col items-center text-gray-600">
-        <svg class="animate-spin h-8 w-8 text-green-500 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <svg class="animate-spin h-8 w-8 text-teal-500 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
           <path class="opacity-75" fill="currentColor"
                 d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
@@ -61,7 +53,7 @@
       v-else
       v-for="(family, index) in paginatedFamilies"
       :key="index"
-      class="bg-white p-5 mb-4 rounded-2xl shadow-md hover:shadow-lg transition cursor-pointer"
+      class="bg-white p-5 mb-4 rounded-2xl transition cursor-pointer"
       @click="toggleExpand(index)"
     >
       <div class="flex justify-between items-center">
@@ -263,6 +255,7 @@ function openAddModal() { router.push('/admin/head-of-families/add') }
 </script>
 
 <style scoped>
+
 button i {
   pointer-events: none;
 }

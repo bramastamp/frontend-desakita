@@ -1,5 +1,5 @@
 <template>
-  <div class="p-8 bg-gray-50 min-h-screen">
+  <div class="p-8 bg-blue-50 min-h-screen">
     <h2 class="text-2xl font-bold mb-6">Edit Acara Desa</h2>
 
     <div class="bg-white rounded-2xl shadow p-6">

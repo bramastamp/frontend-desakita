@@ -1,9 +1,9 @@
 <template>
-  <div class="p-6 bg-green-50 min-h-screen">
+  <div class="p-6 bg-blue-50 min-h-screen">
     <h1 class="text-2xl font-bold text-gray-800 mb-6">Acara Desa</h1>
 
     <!-- Search -->
-    <div class="flex flex-wrap justify-between items-center bg-white p-4 rounded-lg mb-6 shadow-sm">
+    <div class="flex flex-wrap justify-between items-center bg-white p-4 rounded-lg mb-6">
       <input
         type="text"
         v-model="searchQuery"
@@ -22,7 +22,7 @@
     <div
       v-for="(event, index) in paginatedEvents"
       :key="event.id"
-      class="bg-white p-5 mb-4 rounded-2xl shadow-md hover:shadow-lg transition cursor-pointer"
+      class="bg-white p-5 mb-4 rounded-2xl transition cursor-pointer"
       @click="toggleExpand(index)"
     >
       <div class="flex justify-between items-center">

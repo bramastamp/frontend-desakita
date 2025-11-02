@@ -1,11 +1,11 @@
 <template>
-  <div class="p-6 bg-green-50 min-h-screen">
+  <div class="p-6 bg-blue-50 min-h-screen">
     <!-- Title -->
     <h1 class="text-2xl font-bold text-gray-800 mb-6">Anggota Keluarga</h1>
 
     <!-- Search & Controls -->
     <div
-      class="flex flex-wrap justify-between items-center bg-white p-4 rounded-lg mb-6 shadow-sm"
+      class="flex flex-wrap justify-between items-center bg-white p-4 rounded-lg mb-6"
     >
       <input
         type="text"
@@ -30,7 +30,7 @@
 
         <button
           @click="openAddModal"
-          class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          class="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <i class="fa fa-plus"></i> Tambah Baru
         </button>
@@ -40,7 +40,7 @@
     <!-- Kelompok Berdasarkan Relasi -->
     <div v-for="(group, relation) in groupedResidents" :key="relation" class="mb-8">
       <!-- Judul Relasi -->
-      <h2 class="text-xl font-semibold text-green-700 border-l-4 border-green-500 pl-3 mb-4">
+      <h2 class="text-xl font-semibold text-teal-700 border-l-4 border-teal-500 pl-3 mb-4">
         {{ relation }}
       </h2>
 
@@ -52,7 +52,7 @@
         <div
           v-for="resident in group"
           :key="resident.id"
-          class="bg-white p-5 mb-4 rounded-2xl shadow-md hover:shadow-lg transition flex flex-col md:flex-row justify-between items-start gap-4 cursor-pointer"
+          class="bg-white p-5 mb-4 rounded-2xl transition flex flex-col md:flex-row justify-between items-start gap-4"
         >
           <!-- Kiri: Foto + Info -->
           <div class="flex items-center gap-4 w-full md:w-3/4">

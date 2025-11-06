@@ -85,7 +85,7 @@
 import { ref, nextTick, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import api from "../../api";
-import logoImg from "../../assets/logo desaq.png";
+import logoImg from "../../assets/logo-desaq.png";
 import { toastSuccess, toastError, toastWarning } from "../../utils/toast";
 
 const router = useRouter();
@@ -96,7 +96,6 @@ const form = ref(null);
 const logo = ref(null);
 
 const login = async () => {
-  // ✅ Validasi kolom kosong
   if (!email.value || !password.value) {
     toastWarning("Email dan password wajib diisi!");
     return;
@@ -116,6 +115,28 @@ const login = async () => {
     localStorage.setItem("role", user.role);
     localStorage.setItem("name", user.name);
 
+    // ✅ Default kosongkan foto dulu
+    localStorage.setItem("photo", "");
+
+    // ✅ Ambil foto hanya jika user adalah role user (kepala keluarga)
+    if (user.role === "user") {
+      try {
+        const hof = await api.get("/my-head-of-family", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
+        const photoPath = hof?.data?.profile_picture;
+
+        if (photoPath) {
+          localStorage.setItem("photo", `${BASE_URL}/storage/${photoPath}`);
+        }
+      } catch (err) {
+        console.warn("Gagal mengambil foto head-of-family:", err);
+      }
+    }
+
     toastSuccess(`Selamat datang, ${user.name}`);
 
     setTimeout(() => {
@@ -130,6 +151,8 @@ const login = async () => {
     loading.value = false;
   }
 };
+
+
 
 // ✅ Animasi ke register
 const animateToRegister = async () => {

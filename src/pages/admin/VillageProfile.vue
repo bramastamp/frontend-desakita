@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-6">
+  <div class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-50 p-6">
     <div class="max-w-6xl mx-auto">
       <!-- Header -->
       <h1 class="text-3xl font-bold text-gray-900 mb-8">Profil Desa</h1>

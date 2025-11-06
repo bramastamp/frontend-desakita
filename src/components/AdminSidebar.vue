@@ -2,7 +2,7 @@
   <aside class="w-64 min-h-screen bg-white border-r border-gray-100">
     <div class="p-6 flex items-center space-x-2">
       <img src="" alt="Logo" class="w-8 h-8" />
-      <h1 class="text-xl font-semibold text-gray-800">Desa Kito.</h1>
+      <h1 class="text-xl font-bold text-gray-800">Desa Kito.</h1>
     </div>
 
     <nav class="mt-6">

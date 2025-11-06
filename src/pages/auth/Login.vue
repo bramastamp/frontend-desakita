@@ -1,7 +1,7 @@
 <template>
   <div
     ref="container"
-    class="min-h-screen flex flex-col md:flex-row bg-gray-100 overflow-hidden relative"
+    class="min-h-screen h-screen flex flex-col md:flex-row bg-gray-100 overflow-hidden relative"
   >
     <!-- FORM LOGIN -->
     <div
@@ -86,6 +86,7 @@ import { ref, nextTick, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import api from "../../api";
 import logoImg from "../../assets/logo desaq.png";
+import { toastSuccess, toastError, toastWarning } from "../../utils/toast";
 
 const router = useRouter();
 const email = ref("");
@@ -95,26 +96,47 @@ const form = ref(null);
 const logo = ref(null);
 
 const login = async () => {
+  // ✅ Validasi kolom kosong
+  if (!email.value || !password.value) {
+    toastWarning("Email dan password wajib diisi!");
+    return;
+  }
+
   try {
     loading.value = true;
-    const res = await api.post("/login", { email: email.value, password: password.value });
+
+    const res = await api.post("/login", {
+      email: email.value,
+      password: password.value,
+    });
+
     const { token, user } = res.data;
+
     localStorage.setItem("token", token);
     localStorage.setItem("role", user.role);
     localStorage.setItem("name", user.name);
-    router.push(user.role === "admin" ? "/admin/dashboard" : "/user/dashboard");
+
+    toastSuccess(`Selamat datang, ${user.name}`);
+
+    setTimeout(() => {
+      router.push(
+        user.role === "admin" ? "/admin/dashboard" : "/user/dashboard"
+      );
+    }, 1200);
+
   } catch {
-    alert("Login gagal! Cek email dan password.");
+    toastError("Email atau password salah");
   } finally {
     loading.value = false;
   }
 };
 
-// 🌈 Animasi keluar ke register (smooth + cinematic)
+// ✅ Animasi ke register
 const animateToRegister = async () => {
   await nextTick();
   const f = form.value;
   const l = logo.value;
+
   f.classList.remove("animate-form-in");
   l.classList.remove("animate-logo-in");
 
@@ -122,8 +144,6 @@ const animateToRegister = async () => {
   f.style.transform = "translateX(0) rotateY(0) translateZ(0)";
   l.style.transform = "translateX(0) rotateY(0) translateZ(0)";
   f.style.opacity = l.style.opacity = "1";
-  document.body.style.backdropFilter = "blur(0px)";
-  document.body.style.transition = "backdrop-filter 0.6s ease";
 
   requestAnimationFrame(() => {
     f.style.transition = l.style.transition =
@@ -131,20 +151,19 @@ const animateToRegister = async () => {
     f.style.transform = "translateX(-70%) rotateY(-10deg) translateZ(-40px)";
     l.style.transform = "translateX(70%) rotateY(10deg) translateZ(-40px)";
     f.style.opacity = l.style.opacity = "0";
-    document.body.style.backdropFilter = "blur(8px) brightness(0.8)";
+
     setTimeout(() => router.push("/register"), 600);
   });
 };
 
-// 🌟 Animasi masuk cinematic
+// ✅ Animasi masuk
 onMounted(() => {
   const f = form.value;
   const l = logo.value;
-  document.body.style.backdropFilter = "blur(8px) brightness(0.8)";
+
   requestAnimationFrame(() => {
     f.classList.add("animate-form-in");
     l.classList.add("animate-logo-in");
-    document.body.style.backdropFilter = "blur(0px) brightness(1)";
   });
 });
 </script>
@@ -160,6 +179,7 @@ onMounted(() => {
     opacity: 1;
   }
 }
+
 @keyframes formIn {
   from {
     transform: translateX(-60%) rotateY(-10deg) translateZ(-40px);
@@ -170,11 +190,12 @@ onMounted(() => {
     opacity: 1;
   }
 }
+
 .animate-logo-in {
   animation: logoIn 0.7s cubic-bezier(0.77, 0, 0.175, 1) forwards;
 }
+
 .animate-form-in {
   animation: formIn 0.7s cubic-bezier(0.77, 0, 0.175, 1) forwards;
 }
 </style>
-

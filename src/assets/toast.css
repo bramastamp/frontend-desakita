@@ -1,0 +1,82 @@
+/* ===== Base Toast Styling ===== */
+.Vue-Toastification__toast {
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-family: "Inter", sans-serif;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow:
+    0px 4px 14px rgba(0, 0, 0, 0.18),
+    0px 1px 3px rgba(0, 0, 0, 0.10);
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  /* Disable built-in transitions — we override */
+  transition: none !important;
+  animation-duration: 0.45s;
+  animation-fill-mode: both;
+}
+
+
+/* ===== STATUS ===== */
+.Vue-Toastification__toast--success {
+  background: linear-gradient(135deg, #0f766e, #14b8a6);
+  color: white;
+}
+.Vue-Toastification__toast--error {
+  background: linear-gradient(135deg, #b91c1c, #dc2626);
+  color: white;
+}
+.Vue-Toastification__toast--warning {
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+  color: white;
+}
+
+/* Slim progress */
+.Vue-Toastification__progress-bar {
+  height: 3px;
+  opacity: 0.7;
+}
+
+/* icon glow */
+.Vue-Toastification__icon {
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.4));
+}
+
+
+/* ================= Smooth ENTER ================= */
+.Vue-Toastification__toast--enter-active {
+  animation-name: toastEnter;
+}
+@keyframes toastEnter {
+  0% {
+    transform: translateY(22px) scale(0.9);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(-4px) scale(1.03);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ================= Smooth EXIT ================= */
+.Vue-Toastification__toast--leave-active {
+  animation-name: toastExit;
+}
+@keyframes toastExit {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(12px) scale(0.92);
+    opacity: 0;
+  }
+}

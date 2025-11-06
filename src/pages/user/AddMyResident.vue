@@ -107,6 +107,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { User } from "lucide-vue-next";
+import { toastError, toastSuccess, toastWarning } from "../../utils/toast";
 
 const router = useRouter();
 const BASE_URL = "http://127.0.0.1:8000";
@@ -137,7 +138,7 @@ onMounted(async () => {
     form.value.head_of_family_id = res.data.id;
   } catch (error) {
     console.error("Gagal mendapatkan data kepala keluarga:", error);
-    alert("Tidak dapat memuat data kepala keluarga Anda.");
+    toastError("Tidak dapat memuat data kepala keluarga Anda.");
   }
 });
 
@@ -149,12 +150,12 @@ function handleFileUpload(event) {
   const maxSize = 2 * 1024 * 1024; // 2 MB
 
   if (!allowedTypes.includes(file.type)) {
-    alert("Hanya boleh unggah file JPG atau PNG.");
+    toastWarning("Hanya boleh unggah file JPG atau PNG.");
     return;
   }
 
   if (file.size > maxSize) {
-    alert("Ukuran maksimal 2MB.");
+    toastWarning("Ukuran maksimal 2MB.");
     return;
   }
 
@@ -201,17 +202,17 @@ async function submitForm() {
       },
     });
 
-    alert("✅ Anggota keluarga berhasil ditambahkan!");
+    toastSuccess("Anggota keluarga berhasil ditambahkan!");
     router.push("/user/my-residents");
   } catch (error) {
     console.error("Gagal menyimpan anggota:", error.response?.data || error);
-    alert("❌ Gagal menambahkan anggota. Periksa kembali data Anda.");
+    toastError("Gagal menambahkan anggota. Periksa kembali data Anda.");
   }
 }
 
 function validateForm() {
   if (!form.value.name || !form.value.nik || !form.value.gender || !form.value.date_of_birth) {
-    alert("Pastikan semua field wajib sudah diisi!");
+    toastWarning("Pastikan semua field wajib sudah diisi!");
     return false;
   }
   return true;

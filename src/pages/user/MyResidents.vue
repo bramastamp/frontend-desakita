@@ -136,6 +136,7 @@
 import axios from "axios";
 import { ref, computed, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
+import { toastError, toastSuccess } from "../../utils/toast";
 
 const router = useRouter();
 const BASE_URL = "http://127.0.0.1:8000";
@@ -183,11 +184,11 @@ async function deleteResident(id) {
     await axios.delete(`${BASE_URL}/api/my-residents/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    alert("✅ Anggota berhasil dihapus.");
+    toastSuccess("Anggota berhasil dihapus.");
     await fetchResidents();
   } catch (error) {
     console.error("Gagal menghapus:", error);
-    alert("❌ Terjadi kesalahan saat menghapus data.");
+    toastError("Terjadi kesalahan saat menghapus data.");
   }
 }
 

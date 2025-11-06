@@ -169,6 +169,8 @@
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { ref, computed, onMounted, watch } from 'vue'
+import { toastSuccess, toastError } from '../../utils/toast'
+
 
 const router = useRouter()
 const families = ref([])
@@ -213,17 +215,16 @@ async function fetchFamilies() {
 
 // 🔹 Hapus data
 async function deleteFamily(id) {
-  if (!confirm('Apakah Anda yakin ingin menghapus kepala rumah ini beserta akunnya?')) return
   try {
     const token = localStorage.getItem("token")
     await axios.delete(`${BASE_URL}/api/head-of-families/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-    alert('✅ Kepala rumah berhasil dihapus.')
+    toastSuccess('Kepala rumah berhasil dihapus.')
     await fetchFamilies()
   } catch (error) {
     console.error("Gagal menghapus:", error)
-    alert("❌ Terjadi kesalahan saat menghapus data.")
+    toastError("Terjadi kesalahan saat menghapus data.")
   }
 }
 

@@ -117,6 +117,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { User } from "lucide-vue-next";
+import { toastSuccess, toastError, toastWarning } from "../../utils/toast";
 
 const router = useRouter();
 
@@ -145,12 +146,12 @@ function handleFileUpload(event) {
   const maxSize = 2 * 1024 * 1024; // 2 MB
 
   if (!allowedTypes.includes(file.type)) {
-    alert("Hanya boleh unggah file JPG atau PNG.");
+    toastWarning("Hanya boleh unggah file JPG atau PNG.");
     return;
   }
 
   if (file.size > maxSize) {
-    alert("Ukuran maksimal 2MB.");
+    toastWarning("Ukuran maksimal 2MB.");
     return;
   }
 
@@ -216,7 +217,7 @@ async function submitForm() {
       });
     }
 
-    alert("✅ Data kepala rumah berhasil disimpan!");
+    toastSuccess("Data kepala rumah berhasil disimpan!");
     router.push("/admin/head-of-families");
   } catch (error) {
     console.error("❌ Error saat register atau tambah data:", error.response?.data || error);
@@ -232,13 +233,13 @@ async function submitForm() {
       }
     }
 
-    alert("Gagal menyimpan data. Pastikan semua input valid dan ukuran foto sesuai.");
+    toastError("Gagal menyimpan data. Pastikan semua input valid dan ukuran foto sesuai.");
   }
 }
 
 function validateForm() {
   if (!form.value.nama || !form.value.nik || !form.value.email || !form.value.password) {
-    alert("Pastikan semua field wajib sudah diisi!");
+    toastWarning("Pastikan semua field wajib sudah diisi!");
     return false;
   }
 
@@ -248,12 +249,12 @@ function validateForm() {
     const maxSize = 2 * 1024 * 1024; // 2MB
 
     if (!allowedTypes.includes(file.type)) {
-      alert("Format foto harus JPG atau PNG!");
+      toastWarning("Format foto harus JPG atau PNG!");
       return false;
     }
 
     if (file.size > maxSize) {
-      alert("Ukuran foto maksimal 2MB!");
+      toastWarning("Ukuran foto maksimal 2MB!");
       return false;
     }
   }

@@ -194,6 +194,7 @@
 import { ref, computed, onMounted, watch } from "vue"
 import { useRouter } from "vue-router"
 import axios from "axios"
+import { toastError, toastSuccess } from "../../utils/toast"
 
 const router = useRouter()
 const developments = ref([])
@@ -226,17 +227,16 @@ async function fetchDevelopments() {
 
 // 🔹 Delete
 async function deleteDevelopment(id) {
-  if (!confirm("Apakah Anda yakin ingin menghapus data pembangunan ini?")) return
   try {
     const token = localStorage.getItem("token")
     await axios.delete(`${BASE_URL}/api/developments/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-    alert("✅ Data pembangunan berhasil dihapus.")
+    toastSuccess("Data pembangunan berhasil dihapus.")
     await fetchDevelopments()
   } catch (error) {
     console.error("Gagal menghapus pembangunan:", error)
-    alert("❌ Terjadi kesalahan saat menghapus data.")
+    toastError("Terjadi kesalahan saat menghapus data.")
   }
 }
 

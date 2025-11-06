@@ -75,6 +75,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
+import { toastSuccess, toastError, toastWarning } from "../../utils/toast";
 
 const router = useRouter();
 
@@ -118,11 +119,11 @@ async function submitForm() {
       },
     });
 
-    alert("✅ Data pembangunan berhasil disimpan!");
+    toastSuccess("Data pembangunan berhasil disimpan!");
     router.push("/admin/developments");
   } catch (err) {
     console.error(err);
-    alert("❌ Gagal menyimpan data pembangunan!");
+    toastError("Gagal menyimpan data pembangunan!");
   }
 }
 </script>

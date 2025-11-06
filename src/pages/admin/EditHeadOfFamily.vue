@@ -106,6 +106,7 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
 import { User } from "lucide-vue-next";
+import { toastError, toastSuccess, toastWarning } from "../../utils/toast";
 
 const route = useRoute();
 const router = useRouter();
@@ -188,13 +189,13 @@ async function updateForm() {
     // 🔸 Validasi sederhana di sisi frontend
 
     if (form.value.foto && form.value.foto.size > 2 * 1024 * 1024) {
-      alert("❌ Ukuran foto terlalu besar! Maksimal 2MB.");
+      toastError("Ukuran foto terlalu besar! Maksimal 2MB.");
       return;
     }
 
     const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
     if (form.value.foto && !allowedTypes.includes(form.value.foto.type)) {
-      alert("❌ Format foto tidak valid! Gunakan JPG atau PNG.");
+      toastError("Format foto tidak valid! Gunakan JPG atau PNG.");
       return;
     }
 
@@ -223,7 +224,7 @@ async function updateForm() {
       },
     });
 
-    alert("✅ Data kepala rumah berhasil diperbarui!");
+    toastSuccess("Data kepala rumah berhasil diperbarui!");
     router.push("/admin/head-of-families");
 
   } catch (error) {
@@ -236,13 +237,13 @@ async function updateForm() {
       for (const key in errors) {
         errorMessages += `• ${errors[key][0]}\n`;
       }
-      alert(errorMessages);
+      toastError(errorMessages);
     } else if (error.response?.status === 413) {
-      alert("❌ File foto terlalu besar untuk diunggah!");
+      toastError("File foto terlalu besar untuk diunggah!");
     } else if (error.response?.status === 500) {
-      alert("⚠️ Terjadi kesalahan pada server. Coba lagi nanti.");
+      toastError("Terjadi kesalahan pada server. Coba lagi nanti.");
     } else {
-      alert("❌ Gagal memperbarui data. Periksa koneksi dan coba lagi.");
+      toastError("Gagal memperbarui data. Periksa koneksi dan coba lagi.");
     }
   }
 }

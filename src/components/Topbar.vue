@@ -32,6 +32,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { LogOut } from 'lucide-vue-next'
+import { toastSuccess } from '../utils/toast'
 
 const router = useRouter()
 const userName = ref('')
@@ -48,6 +49,7 @@ const logout = () => {
   localStorage.removeItem('role')
   localStorage.removeItem('name')
   router.push('/login')
+  toastSuccess("Logout Berhasil!!")
 }
 </script>
 

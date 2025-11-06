@@ -75,6 +75,7 @@
 import { ref } from "vue"
 import { useRouter } from "vue-router"
 import axios from "axios"
+import { toastError, toastSuccess } from "../../utils/toast"
 
 const router = useRouter()
 const BASE_URL = "http://127.0.0.1:8000"
@@ -120,11 +121,11 @@ async function submitForm() {
       },
     })
 
-    alert("✅ Acara berhasil ditambahkan!")
+    toastSuccess("Acara berhasil ditambahkan!")
     router.push("/admin/events")
   } catch (err) {
     console.error(err)
-    alert("❌ Gagal menambahkan acara!")
+    toastError("Gagal menambahkan acara!")
   }
 }
 </script>

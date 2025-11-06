@@ -157,6 +157,7 @@
 import { ref, computed, onMounted, watch } from "vue"
 import { useRouter } from "vue-router"
 import axios from "axios"
+import { toastError, toastSuccess } from "../../utils/toast"
 
 const router = useRouter()
 const BASE_URL = "http://127.0.0.1:8000"
@@ -187,17 +188,16 @@ async function fetchEvents() {
 
 // 🔹 Hapus
 async function deleteEvent(id) {
-  if (!confirm("Apakah Anda yakin ingin menghapus acara ini?")) return
   try {
     const token = localStorage.getItem("token")
     await axios.delete(`${BASE_URL}/api/events/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-    alert("✅ Acara berhasil dihapus.")
+    toastSuccess("Acara berhasil dihapus.")
     await fetchEvents()
   } catch (err) {
     console.error(err)
-    alert("❌ Gagal menghapus acara!")
+    toastError("Gagal menghapus acara!")
   }
 }
 

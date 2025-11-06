@@ -84,6 +84,7 @@
 import { ref, onMounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import axios from "axios"
+import { toastError, toastSuccess, toastWarning } from "../../utils/toast"
 
 const router = useRouter()
 const route = useRoute()
@@ -139,7 +140,7 @@ onMounted(async () => {
     }
   } catch (err) {
     console.error(err)
-    alert("❌ Gagal memuat data acara!")
+    toastError("Gagal memuat data acara!")
     router.push("/admin/events")
   }
 })
@@ -151,8 +152,8 @@ function handleFileUpload(e) {
   if (!file) return
 
   const allowed = ["image/jpeg", "image/png"]
-  if (!allowed.includes(file.type)) return alert("File harus JPG atau PNG!")
-  if (file.size > 2 * 1024 * 1024) return alert("Ukuran maksimal 2MB!")
+  if (!allowed.includes(file.type)) return toastWarning("File harus JPG atau PNG!")
+  if (file.size > 2 * 1024 * 1024) return toastWarning("Ukuran maksimal 2MB!")
 
   form.value.event_photo = file
   previewUrl.value = URL.createObjectURL(file)
@@ -183,11 +184,11 @@ async function updateEvent() {
       },
     })
 
-    alert("✅ Data acara berhasil diperbarui!")
+    toastSuccess("Data acara berhasil diperbarui!")
     router.push("/admin/events")
   } catch (err) {
     console.error(err)
-    alert("❌ Gagal memperbarui acara!")
+    toastError("Gagal memperbarui acara!")
   }
 }
 </script>

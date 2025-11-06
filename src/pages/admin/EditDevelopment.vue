@@ -89,6 +89,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
+import { toastError, toastSuccess } from "../../utils/toast";
 
 const router = useRouter();
 const route = useRoute();
@@ -139,7 +140,7 @@ async function fetchDevelopment() {
     };
   } catch (err) {
     console.error("Gagal memuat data pembangunan:", err);
-    alert("❌ Gagal memuat data pembangunan!");
+    toastError("Gagal memuat data pembangunan!");
   }
 }
 
@@ -171,11 +172,11 @@ async function updateDevelopment() {
       },
     });
 
-    alert("✅ Data pembangunan berhasil diperbarui!");
+    toastSuccess("Data pembangunan berhasil diperbarui!");
     router.push("/admin/developments");
   } catch (err) {
     console.error(err);
-    alert("❌ Gagal memperbarui data pembangunan!");
+    toastError("Gagal memperbarui data pembangunan!");
   }
 }
 </script>

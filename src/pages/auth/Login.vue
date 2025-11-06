@@ -122,7 +122,7 @@ const login = async () => {
       router.push(
         user.role === "admin" ? "/admin/dashboard" : "/user/dashboard"
       );
-    }, 1200);
+    }, 500);
 
   } catch {
     toastError("Email atau password salah");

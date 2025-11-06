@@ -114,6 +114,7 @@ import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
 import { User } from "lucide-vue-next";
+import { toastError, toastSuccess, toastWarning } from "../../utils/toast";
 
 const router = useRouter();
 const route = useRoute();
@@ -167,7 +168,7 @@ async function fetchResident() {
     }
   } catch (error) {
     console.error("Gagal memuat data anggota:", error);
-    alert("Tidak dapat memuat data anggota keluarga.");
+    toastError("Tidak dapat memuat data anggota keluarga.");
     router.push("/user/my-residents");
   }
 }
@@ -180,12 +181,12 @@ function handleFileUpload(event) {
   const maxSize = 2 * 1024 * 1024;
 
   if (!allowedTypes.includes(file.type)) {
-    alert("Hanya boleh unggah file JPG atau PNG.");
+    toastWarning("Hanya boleh unggah file JPG atau PNG.");
     return;
   }
 
   if (file.size > maxSize) {
-    alert("Ukuran maksimal 2MB.");
+    toastWarning("Ukuran maksimal 2MB.");
     return;
   }
 
@@ -223,11 +224,11 @@ async function updateResident() {
       },
     });
 
-    alert("✅ Data anggota berhasil diperbarui!");
+    toastSuccess("Data anggota berhasil diperbarui!");
     router.push("/user/my-residents");
   } catch (error) {
     console.error("Gagal memperbarui:", error.response?.data || error);
-    alert("❌ Gagal memperbarui data anggota.");
+    toastError("Gagal memperbarui data anggota.");
   }
 }
 </script>

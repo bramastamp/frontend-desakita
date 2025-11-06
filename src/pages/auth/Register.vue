@@ -1,7 +1,7 @@
 <template>
   <div
     ref="container"
-    class="min-h-screen flex flex-col md:flex-row bg-gray-100 overflow-hidden relative"
+    class="h-screen flex flex-col md:flex-row bg-gray-100 overflow-hidden relative"
   >
     <!-- LOGO -->
     <div ref="logo" class="flex-1 flex items-center justify-center p-8 animate-logo-in">
@@ -83,6 +83,7 @@ import { ref, nextTick, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import api from "../../api";
 import logoImg from "../../assets/logo desaq.png";
+import { toastSuccess, toastError, toastWarning } from "../../utils/toast";
 
 const router = useRouter();
 const name = ref("");
@@ -93,58 +94,79 @@ const form = ref(null);
 const logo = ref(null);
 
 const register = async () => {
+  if (!name.value || !email.value || !password.value) {
+    toastWarning("Semua kolom wajib diisi!");
+    return;
+  }
+
+  if (password.value.length < 6) {
+    toastWarning("Password minimal 6 karakter!");
+    return;
+  }
+
   try {
     loading.value = true;
-    await api.post("/register", { name: name.value, email: email.value, password: password.value });
-    alert("Registrasi berhasil! Silakan login.");
-    router.push("/login");
-  } catch {
-    alert("Registrasi gagal! Periksa data yang kamu masukkan.");
+
+    await api.post("/register", {
+      name: name.value,
+      email: email.value,
+      password: password.value,
+    });
+
+    toastSuccess("Registrasi berhasil! Silakan login.");
+
+    setTimeout(() => {
+      router.push("/login");
+    }, 1200);
+
+  } catch (error) {
+    toastError(
+      error?.response?.data?.message ||
+        "Registrasi gagal! Periksa data yang kamu masukkan."
+    );
   } finally {
     loading.value = false;
   }
 };
 
-// 🌈 Animasi keluar ke login (smooth + cinematic)
+
+// ✅ Animasi keluar → Login
 const animateToLogin = async () => {
   await nextTick();
   const f = form.value;
   const l = logo.value;
+
   f.classList.remove("animate-form-in");
   l.classList.remove("animate-logo-in");
 
   f.style.transition = l.style.transition = "none";
-  f.style.transform = "translateX(0) rotateY(0) translateZ(0)";
-  l.style.transform = "translateX(0) rotateY(0) translateZ(0)";
-  f.style.opacity = l.style.opacity = "1";
-  document.body.style.backdropFilter = "blur(0px)";
-  document.body.style.transition = "backdrop-filter 0.6s ease";
 
   requestAnimationFrame(() => {
     f.style.transition = l.style.transition =
       "transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.6s ease";
+
     f.style.transform = "translateX(70%) rotateY(10deg) translateZ(-40px)";
     l.style.transform = "translateX(-70%) rotateY(-10deg) translateZ(-40px)";
     f.style.opacity = l.style.opacity = "0";
-    document.body.style.backdropFilter = "blur(8px) brightness(0.8)";
+
     setTimeout(() => router.push("/login"), 600);
   });
 };
 
-// 🌟 Animasi masuk cinematic
+// ✅ Animasi masuk
 onMounted(() => {
   const f = form.value;
   const l = logo.value;
-  document.body.style.backdropFilter = "blur(8px) brightness(0.8)";
+
   requestAnimationFrame(() => {
     f.classList.add("animate-form-in");
     l.classList.add("animate-logo-in");
-    document.body.style.backdropFilter = "blur(0px) brightness(1)";
   });
 });
 </script>
 
 <style scoped>
+/* Animasi masuk */
 @keyframes logoIn {
   from {
     transform: translateX(-60%) rotateY(-10deg) translateZ(-40px);
@@ -172,8 +194,3 @@ onMounted(() => {
   animation: formIn 0.7s cubic-bezier(0.77, 0, 0.175, 1) forwards;
 }
 </style>
-
-
-
-
-

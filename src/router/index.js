@@ -14,7 +14,8 @@ import HeadOfFamilies from '../pages/admin/HeadOfFamilies.vue';
 import HeadOfFamiliesAdd from '../pages/admin/AddHeadOfFamily.vue';
 import HeadOfFamiliesEdit from '../pages/admin/EditHeadOfFamily.vue';
 import SocialAidsList from '../pages/admin/socialAids/SocialAidsList.vue';
-import SocialAidsApplications from '../pages/admin/socialAids/SocialAidsApplications.vue';
+import SocialAidsDetail from '../pages/admin/socialAids/SocialAidsDetail.vue';
+import RecipientsList from '../pages/admin/socialAids/RecipientsList.vue';
 import Developments from '../pages/admin/Developments.vue';
 import DevelopmentsAdd from '../pages/admin/AddDevelopments.vue';
 import DevelopmentsEdit from '../pages/admin/EditDevelopment.vue';
@@ -30,6 +31,8 @@ import MyResidentsAdd from '../pages/user/AddMyResident.vue';
 import MyResidentsEdit from '../pages/user/EditMyResident.vue';
 import UserDevelopments from '../pages/user/Developments.vue';
 import UserEvents from '../pages/user/Events.vue';
+import UserSocialAidsList from '../pages/user/socialAids/SocialAidsList.vue';
+import UserSocialAidsStatus from '../pages/user/socialAids/SocialAidsStatus.vue';
 
 const routes = [
   { path: '/login', component: Login },
@@ -55,7 +58,8 @@ const routes = [
         path: 'social-aids',
         children: [
           { path: 'list', component: SocialAidsList },
-          { path: 'applications', component: SocialAidsApplications },
+          { path: 'detail', component: SocialAidsDetail },
+          { path: 'recipients', component: RecipientsList },
           { path: '', redirect: '/admin/social-aids/list' }, // default route
         ],
       },
@@ -77,8 +81,8 @@ const routes = [
       {
         path: 'social-aids',
         children: [
-          { path: 'list', component: SocialAidsList },
-          { path: 'applications', component: SocialAidsApplications },
+          { path: 'list', component: UserSocialAidsList },
+          { path: 'status', component: UserSocialAidsStatus },
           { path: '', redirect: '/admin/social-aids/list' }, // default route
         ],
       },

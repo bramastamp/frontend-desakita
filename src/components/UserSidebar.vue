@@ -103,7 +103,7 @@ const menuItems = [
     icon: Gift,
     children: [
       { name: 'Daftar Bantuan', route: '/user/social-aids/list' },
-      { name: 'Pengajuan Bantuan', route: '/user/social-aids/applications' },
+      { name: 'Status Bantuan Saya', route: '/user/social-aids/status' },
     ],
   },
   { name: 'Pembangunan', route: '/user/developments', icon: Building2 },

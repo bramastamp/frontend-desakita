@@ -82,7 +82,7 @@
 import { ref, nextTick, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import api from "../../api";
-import logoImg from "../../assets/logo desaq.png";
+import logoImg from "../../assets/logo-desaq.png";
 import { toastSuccess, toastError, toastWarning } from "../../utils/toast";
 
 const router = useRouter();

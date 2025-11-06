@@ -1,11 +1,11 @@
 <template>
   <aside class="w-64 min-h-screen bg-white border-r border-gray-100">
-    <div class="p-6 flex items-center space-x-2">
-      <img src="" alt="Logo" class="w-8 h-8" />
-      <h1 class="text-xl font-bold text-gray-800">Desa Kito.</h1>
+    <div class="p-6 pb-3 pt-3 flex items-center space-x-3">
+      <img :src="logoImg" alt="Logo" class="w-12 h-12" />
+      <h1 class="text-2xl font-bold text-gray-800">DesaQ</h1>
     </div>
 
-    <nav class="mt-6">
+    <nav class="mt-3">
       <ul class="space-y-1">
         <li v-for="item in menuItems" :key="item.name">
           <div v-if="item.children">
@@ -75,6 +75,7 @@
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Home, Users, Gift, Calendar, Building2, Map } from 'lucide-vue-next'
+import logoImg from "../assets/logo-desaq.png";
 
 const route = useRoute()
 const router = useRouter()

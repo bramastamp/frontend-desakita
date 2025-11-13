@@ -5,19 +5,55 @@
       Statistik Desa
     </h1>
 
-    <!-- Statistik Ringkas -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+    <!-- Grid Utama -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+      <!-- Card Besar - Bantuan Sosial -->
       <div
-        v-for="(item, i) in statCards"
-        :key="i"
-        class="bg-white rounded-2xl shadow p-6 flex items-center gap-4 transition hover:shadow-lg hover:scale-[1.02]"
+        class="lg:col-span-2 rounded-3xl text-white shadow-lg p-10 flex flex-col justify-between min-h-[320px]"
+        style="background: linear-gradient(135deg, #9DDE60 0%, #3B6636 66%, #062B24 100%)"
       >
-        <div :class="item.iconBg" class="p-3 rounded-full">
-          <i :class="item.icon" class="text-2xl"></i>
-        </div>
         <div>
-          <h3 class="text-gray-600 text-sm">{{ item.label }}</h3>
-          <p class="text-2xl font-bold text-gray-800">{{ item.value }}</p>
+          <div
+            class="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center mb-6"
+          >
+            <i class="fa fa-hand-holding-heart text-white text-3xl"></i>
+          </div>
+          <h4 class="text-base uppercase tracking-wide font-medium text-green-100">
+            Bantuan Sosial
+          </h4>
+          <h2 class="text-3xl md:text-4xl font-bold mb-3">
+            Dari Desa untuk Warga
+          </h2>
+          <p class="text-green-100 text-sm md:text-base leading-relaxed max-w-lg">
+            Wujudkan kesejahteraan desa dengan bantuan sosial yang tepat sasaran.
+          </p>
+        </div>
+
+        <div class="mt-10">
+          <p class="text-6xl font-extrabold">{{ stats.socialAids }}</p>
+          <p class="text-green-100 text-sm mt-1">Total Program Bansos</p>
+        </div>
+      </div>
+
+      <!-- Card Statistik (2x2 Grid) -->
+      <div class="grid grid-cols-2 grid-rows-2 gap-4 h-full">
+        <div
+          v-for="(item, i) in filteredStatCards"
+          :key="i"
+          class="bg-white rounded-2xl p-5 shadow hover:shadow-lg transition flex flex-col justify-between items-start aspect-square"
+        >
+          <div class="flex items-center justify-between w-full mb-2">
+            <h3 class="text-gray-600 text-sm font-medium">
+              {{ item.label }}
+            </h3>
+            <div
+              class="w-8 h-8 flex items-center justify-center rounded-full"
+              :class="item.iconBg"
+            >
+              <i :class="item.icon" class="text-lg"></i>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">{{ item.value }}</p>
         </div>
       </div>
     </div>
@@ -39,6 +75,12 @@
           <span class="text-gray-700">{{ item.title }}</span>
           <span class="text-sm text-gray-500">{{ item.date }}</span>
         </li>
+        <li
+          v-if="news.length === 0"
+          class="text-gray-500 text-sm italic py-2"
+        >
+          Tidak ada informasi terbaru minggu ini.
+        </li>
       </ul>
     </div>
   </div>
@@ -57,9 +99,7 @@ const stats = ref({
   socialAids: 0,
 })
 
-// 🔹 Info terbaru (dinamis)
 const news = ref([])
-const loading = ref(true) // 🔹 indikator loading
 
 onMounted(fetchDashboardData)
 
@@ -104,7 +144,9 @@ async function fetchDashboardData() {
       })),
     ]
 
-    // 🔹 Urutkan berdasarkan tanggal terbaru
+    const oneWeekAgo = new Date()
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+
     news.value = combined
       .filter((item) => item.date >= oneWeekAgo)
       .sort((a, b) => b.date - a.date)
@@ -113,12 +155,11 @@ async function fetchDashboardData() {
         date: item.date.toLocaleDateString("id-ID"),
       }))
   } catch (err) {
-    console.error("Gagal memuat data dashboard:", err)
+    console.error("Gagal memuat data dashboard admin:", err)
   }
 }
 
-// 🔹 Statistik Ringkas
-const statCards = computed(() => [
+const filteredStatCards = computed(() => [
   {
     label: "Jumlah Penduduk",
     value: stats.value.totalResidents,

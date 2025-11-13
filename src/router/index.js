@@ -10,19 +10,26 @@ import Register from '../pages/auth/Register.vue';
 
 // Admin pages
 import AdminDashboard from '../pages/admin/Dashboard.vue';
+
 import HeadOfFamilies from '../pages/admin/HeadOfFamilies.vue';
 import HeadOfFamiliesAdd from '../pages/admin/AddHeadOfFamily.vue';
 import HeadOfFamiliesEdit from '../pages/admin/EditHeadOfFamily.vue';
+
 import SocialAidsList from '../pages/admin/socialAids/SocialAidsList.vue';
+import SocialAidsAdd from '../pages/admin/socialAids/AddSocialAid.vue';
+import SocialAidsEdit from '../pages/admin/socialAids/EditSocialAid.vue';
 import SocialAidsDetail from '../pages/admin/socialAids/SocialAidsDetail.vue';
 import RecipientsList from '../pages/admin/socialAids/RecipientsList.vue';
+
 import Developments from '../pages/admin/Developments.vue';
 import DevelopmentsAdd from '../pages/admin/AddDevelopments.vue';
 import DevelopmentsEdit from '../pages/admin/EditDevelopment.vue';
+
 import Events from '../pages/admin/Events.vue';
 import EventsAdd from '../pages/admin/AddEvent.vue';
 import EventsEdit from '../pages/admin/EditEvent.vue';
-import VillageProfile from '../pages/admin/VillageProfile.vue'
+
+import VillageProfile from '../pages/admin/VillageProfile.vue';
 
 // User pages
 import UserDashboard from '../pages/user/Dashboard.vue';
@@ -58,7 +65,9 @@ const routes = [
         path: 'social-aids',
         children: [
           { path: 'list', component: SocialAidsList },
-          { path: 'detail', component: SocialAidsDetail },
+          { path: 'add', component: SocialAidsAdd },
+          { path: ':id', component: SocialAidsDetail },
+          { path: ':id/edit', component: SocialAidsEdit },
           { path: 'recipients', component: RecipientsList },
           { path: '', redirect: '/admin/social-aids/list' }, // default route
         ],

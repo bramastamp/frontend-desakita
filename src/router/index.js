@@ -39,7 +39,6 @@ import MyResidentsEdit from '../pages/user/EditMyResident.vue';
 import UserDevelopments from '../pages/user/Developments.vue';
 import UserEvents from '../pages/user/Events.vue';
 import UserSocialAidsList from '../pages/user/socialAids/SocialAidsList.vue';
-import UserSocialAidsStatus from '../pages/user/socialAids/SocialAidsStatus.vue';
 
 const routes = [
   { path: '/login', component: Login },
@@ -69,7 +68,6 @@ const routes = [
           { path: ':id', component: SocialAidsDetail },
           { path: ':id/edit', component: SocialAidsEdit },
           { path: 'recipients', component: RecipientsList },
-          { path: '', redirect: '/admin/social-aids/list' }, // default route
         ],
       },
     ],
@@ -91,8 +89,6 @@ const routes = [
         path: 'social-aids',
         children: [
           { path: 'list', component: UserSocialAidsList },
-          { path: 'status', component: UserSocialAidsStatus },
-          { path: '', redirect: '/admin/social-aids/list' }, // default route
         ],
       },
     ],

@@ -129,6 +129,7 @@ async function fetchDashboardData() {
       socialAids: bansosRes.data?.length || 0,
     }
 
+    // 🔹 Gabung data terbaru dari 3 sumber
     const combined = [
       ...devRes.data.map((d) => ({
         title: `Pembangunan: ${d.title || d.name}`,

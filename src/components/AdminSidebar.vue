@@ -81,10 +81,6 @@ const route = useRoute()
 const router = useRouter()
 const openSubmenu = ref(null)
 
-if (route.path.startsWith('/admin/social-aids')) {
-  openSubmenu.value = 'Bantuan Sosial'
-}
-
 function handleParentClick(item) {
   if (item.children && item.children.length > 0) {
     openSubmenu.value = openSubmenu.value === item.name ? null : item.name
@@ -101,10 +97,7 @@ const menuItems = [
   {
     name: 'Bantuan Sosial',
     icon: Gift,
-    children: [
-      { name: 'Daftar Bantuan', route: '/admin/social-aids/list' },
-      { name: 'Rekap Penerima', route: '/admin/social-aids/recipients' }, // opsional
-    ],
+    route: '/admin/social-aids/list',
   },
   { name: 'Pembangunan', route: '/admin/developments', icon: Building2 },
   { name: 'Acara', route: '/admin/events', icon: Calendar },

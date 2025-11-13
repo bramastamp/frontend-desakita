@@ -20,7 +20,7 @@
         </div>
         <img
           :src="aid.thumbnail ? `${BASE_URL}/storage/${aid.thumbnail}` : 'https://placehold.co/120x120?text=Bantuan'"
-          class="w-32 h-32 rounded-xl object-cover border"
+          class="w-72 h-48 rounded-xl object-cover border"
         />
       </div>
 
@@ -93,7 +93,40 @@
               class="hover:bg-gray-50"
             >
               <td class="py-2 px-4 border-b">{{ recipient.user?.name || 'Tidak diketahui' }}</td>
-              <td class="py-2 px-4 border-b capitalize">{{ recipient.pivot.status || '-' }}</td>
+              <td class="py-2 px-4 border-b">
+                <div class="relative inline-block max-w-[160px]">
+                  <select
+                    v-model="recipient.pivot.status"
+                    @change="updateRecipientStatus(recipient)"
+                    :class="[
+                      'w-full px-3 py-1 pr-8 rounded-lg text-sm font-medium capitalize cursor-pointer transition-colors duration-200 appearance-none focus:outline-none',
+                      {
+                        'text-yellow-700 bg-yellow-100': recipient.pivot.status === 'pending',
+                        'text-green-700 bg-green-100': recipient.pivot.status === 'approved',
+                        'text-red-700 bg-red-100': recipient.pivot.status === 'rejected',
+                        'text-blue-700 bg-blue-100': recipient.pivot.status === 'distributed',
+                      },
+                    ]"
+                  >
+                    <option value="pending" class="text-yellow-700 bg-yellow-100">Pending</option>
+                    <option value="approved" class="text-green-700 bg-green-100">Approved</option>
+                    <option value="rejected" class="text-red-700 bg-red-100">Rejected</option>
+                    <option value="distributed" class="text-blue-700 bg-blue-100">Distributed</option>
+                  </select>
+
+                  <!-- Panah dropdown -->
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4 text-gray-500 absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </td>
               <td class="py-2 px-4 border-b">
                 {{
                   recipient.pivot.received_nominal
@@ -134,7 +167,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
-import { toastError } from '../../../utils/toast'
+import { toastSuccess, toastError } from '../../../utils/toast';
 
 const router = useRouter()
 const route = useRoute()
@@ -194,6 +227,22 @@ async function fetchRecipients() {
     loadingRecipients.value = false
   }
 }
+
+async function updateRecipientStatus(recipient) {
+  try {
+    const token = localStorage.getItem('token');
+    await axios.patch(
+      `${BASE_URL}/api/social-aids/${route.params.id}/recipients/${recipient.id}`,
+      { status: recipient.pivot.status },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  } catch (error) {
+    console.error(error);
+    toastError('Gagal memperbarui status penerima.');
+  }
+  toastSuccess('Status penerima berhasil diperbarui.');
+}
+
 
 // Filter real-time (menggunakan query yang sudah di-debounce)
 const filteredRecipients = computed(() => {

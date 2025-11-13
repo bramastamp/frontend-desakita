@@ -56,6 +56,42 @@
             <label class="block text-sm font-medium text-gray-700">Deskripsi</label>
             <textarea v-model="form.description" class="input" rows="3"></textarea>
           </div>
+
+          <div class="col-span-2 mt-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Kepala Keluarga Penerima</label>
+
+          <!-- Search -->
+          <input
+            v-model="searchInput"
+            type="text"
+            placeholder="Cari berdasarkan NIK atau alamat..."
+            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none mb-2"
+          />
+
+          <div v-if="loadingRecipients" class="text-gray-500 italic">Memuat daftar kepala keluarga...</div>
+
+          <div v-else class="border border-gray-200 rounded-lg p-3 max-h-60 overflow-y-auto">
+            <div
+              v-for="family in paginatedFamilies"
+              :key="family.id"
+              class="flex items-center gap-2 py-1"
+            >
+              <input
+                type="checkbox"
+                :value="family.id"
+                v-model="selectedRecipients"
+                class="text-blue-600 focus:ring-blue-500"
+              />
+              <span class="text-gray-700 text-sm">
+                {{ family.nik }} — {{ family.address }}
+              </span>
+            </div>
+
+            <div v-if="!paginatedFamilies.length" class="text-gray-500 text-center py-3">
+              Tidak ada hasil yang cocok.
+            </div>
+          </div>
+        </div>
         </div>
 
         <!-- Tombol -->
@@ -80,7 +116,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import { toastError, toastSuccess } from '../../../utils/toast'
@@ -99,6 +135,14 @@ const form = ref({
 })
 
 const previewUrl = ref(null)
+const selectedRecipients = ref([])
+const headOfFamilies = ref([])
+const loadingRecipients = ref(true)
+const searchInput = ref('')
+const searchQuery = ref('')
+const currentPage = ref(1)
+const itemsPerPage = 10
+
 
 function handleFileUpload(event) {
   const file = event.target.files[0]
@@ -110,10 +154,11 @@ function handleFileUpload(event) {
 onMounted(async () => {
   try {
     const token = localStorage.getItem('token')
+    
+    // Ambil data bantuan
     const { data } = await axios.get(`${BASE_URL}/api/social-aids/${route.params.id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-
     form.value = {
       aid_name: data.aid_name,
       category: data.category,
@@ -126,11 +171,27 @@ onMounted(async () => {
     if (data.thumbnail) {
       previewUrl.value = `${BASE_URL}/storage/${data.thumbnail}`
     }
+
+    // Ambil semua kepala keluarga
+    const res = await axios.get(`${BASE_URL}/api/head-of-families`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    headOfFamilies.value = res.data
+
+    // Ambil penerima lama dan tandai
+    const recipientsRes = await axios.get(`${BASE_URL}/api/social-aids/${route.params.id}/recipients`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    selectedRecipients.value = recipientsRes.data.map(r => r.id)
+
   } catch (err) {
     console.error(err)
     toastError('Gagal memuat data bantuan sosial')
+  } finally {
+    loadingRecipients.value = false
   }
 })
+
 
 // 🔹 Update data
 async function updateAid() {
@@ -144,12 +205,20 @@ async function updateAid() {
       }
     })
 
+    // Update data utama
     await axios.post(`${BASE_URL}/api/social-aids/${route.params.id}?_method=PUT`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'multipart/form-data',
       },
     })
+
+    // Update penerima (jika ada)
+    await axios.post(
+      `${BASE_URL}/api/social-aids/${route.params.id}/recipients/update`,
+      { head_of_family_ids: selectedRecipients.value },
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
 
     toastSuccess('Data bantuan sosial berhasil diperbarui')
     router.push('/admin/social-aids')
@@ -158,6 +227,35 @@ async function updateAid() {
     toastError('Gagal memperbarui data')
   }
 }
+
+
+let debounceTimer
+watch(searchInput, (newVal) => {
+  clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => {
+    searchQuery.value = newVal.toLowerCase()
+    currentPage.value = 1
+  }, 500)
+})
+
+const filteredFamilies = computed(() => {
+  const query = searchQuery.value
+  if (!query) return headOfFamilies.value
+  return headOfFamilies.value.filter((f) => {
+    const nik = f.nik?.toLowerCase() || ''
+    const addr = f.address?.toLowerCase() || ''
+    return nik.includes(query) || addr.includes(query)
+  })
+})
+
+const totalPages = computed(() => Math.ceil(filteredFamilies.value.length / itemsPerPage))
+const paginatedFamilies = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  return filteredFamilies.value.slice(start, start + itemsPerPage)
+})
+function nextPage() { if (currentPage.value < totalPages.value) currentPage.value++ }
+function prevPage() { if (currentPage.value > 1) currentPage.value-- }
+
 </script>
 
 <style scoped>

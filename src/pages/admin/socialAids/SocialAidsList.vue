@@ -96,14 +96,18 @@
           v-if="expandedIndex === index"
           class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         >
+          <!-- Nominal Bantuan -->
           <div class="flex items-center gap-3 bg-blue-50 px-3 py-2 rounded-lg">
             <i class="fa fa-wallet text-blue-600 text-xl"></i>
             <div>
-              <p class="text-blue-800 font-semibold">Rp {{ Number(aid.nominal).toLocaleString('id-ID') }}</p>
+              <p class="text-blue-800 font-semibold">
+                Rp {{ Number(aid.nominal).toLocaleString('id-ID') }}
+              </p>
               <p class="text-xs text-gray-600">Nominal Bantuan</p>
             </div>
           </div>
 
+          <!-- Deskripsi -->
           <div class="flex items-center gap-3 bg-yellow-50 px-3 py-2 rounded-lg md:col-span-2">
             <i class="fa fa-align-left text-yellow-600 text-xl"></i>
             <div>
@@ -112,11 +116,21 @@
             </div>
           </div>
 
+          <!-- Dibuat Pada -->
           <div class="flex items-center gap-3 bg-green-50 px-3 py-2 rounded-lg">
             <i class="fa fa-calendar text-green-600 text-xl"></i>
             <div>
               <p class="text-green-800 font-semibold">{{ formatDate(aid.created_at) }}</p>
               <p class="text-xs text-gray-600">Dibuat Pada</p>
+            </div>
+          </div>
+
+          <!-- Jumlah Penerima -->
+          <div class="flex items-center gap-3 bg-purple-50 px-3 py-2 rounded-lg">
+            <i class="fa fa-users text-purple-600 text-xl"></i>
+            <div>
+              <p class="text-purple-800 font-semibold">{{ aid.recipients_count || 0 }}</p>
+              <p class="text-xs text-gray-600">Jumlah Penerima</p>
             </div>
           </div>
         </div>

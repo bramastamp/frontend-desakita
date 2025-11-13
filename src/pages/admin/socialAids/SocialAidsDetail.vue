@@ -19,7 +19,7 @@
           <p class="text-gray-600">Donatur: {{ aid.donor_name }}</p>
         </div>
         <img
-          :src="aid.thumbnail ? `${BASE_URL}/storage/${aid.thumbnail}` : 'https://placehold.co/120x120?text=Bantuan'"
+          :src="aid.thumbnail || 'https://placehold.co/120x120?text=Bantuan'"
           class="w-72 h-48 rounded-xl object-cover border"
         />
       </div>

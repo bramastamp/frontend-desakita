@@ -163,14 +163,14 @@ const statCards = computed(() => [
   {
     label: "Pembangunan Desa",
     value: stats.value.developments,
-    icon: "fa fa-building text-green-600",
-    iconBg: "bg-green-100",
+    icon: "fa fa-building text-yellow-600",
+    iconBg: "bg-yellow-100",
   },
   {
     label: "Acara Desa",
     value: stats.value.events,
-    icon: "fa fa-calendar text-green-600",
-    iconBg: "bg-green-100",
+    icon: "fa fa-calendar text-orange-600",
+    iconBg: "bg-orange-100",
   },
   {
     label: "Bantuan Sosial Saya",

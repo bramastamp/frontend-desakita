@@ -169,7 +169,7 @@ onMounted(async () => {
     }
 
     if (data.thumbnail) {
-      previewUrl.value = `${BASE_URL}/storage/${data.thumbnail}`
+      previewUrl.value = data.thumbnail
     }
 
     // Ambil semua kepala keluarga

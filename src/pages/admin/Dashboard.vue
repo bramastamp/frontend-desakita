@@ -1,7 +1,9 @@
 <template>
-  <div class="p-6 bg-blue-50 min-h-screen space-y-8">
+  <div class="p-6 bg-[#f3faf7] min-h-screen space-y-10">
     <!-- Judul -->
-    <h1 class="text-3xl font-bold text-gray-800 mb-4">Dashboard Desa</h1>
+    <h1 class="text-2xl md:text-3xl font-semibold text-gray-800">
+      Statistik Desa
+    </h1>
 
     <!-- Statistik Ringkas -->
     <div
@@ -41,8 +43,11 @@
 
     <!-- Informasi Terbaru -->
     <div class="bg-white rounded-2xl shadow p-6">
-      <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-        <i class="fa fa-bullhorn text-teal-500"></i> Informasi Terbaru
+      <h2
+        class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
+      >
+        <i class="fa fa-bullhorn text-teal-500"></i>
+        Informasi Terbaru (7 Hari Terakhir)
       </h2>
 
       <!-- Skeleton untuk berita -->
@@ -107,7 +112,7 @@ async function fetchDashboardData() {
     const families = familiesRes.data || []
     const totalResidents = families.reduce((sum, f) => {
       const count = f.residents ? f.residents.length : f.residents_count || 0
-      return sum + count + 1 // kepala keluarga juga dihitung
+      return sum + count + 1
     }, 0)
 
     stats.value = {
@@ -121,21 +126,25 @@ async function fetchDashboardData() {
     const combined = [
       ...devRes.data.map((d) => ({
         title: `Pembangunan: ${d.title || d.name}`,
-        date: new Date(d.created_at).toLocaleDateString("id-ID"),
+        date: new Date(d.created_at),
       })),
       ...eventsRes.data.map((e) => ({
         title: `Acara: ${e.title || e.name}`,
-        date: new Date(e.created_at).toLocaleDateString("id-ID"),
+        date: new Date(e.created_at),
       })),
       ...bansosRes.data.map((b) => ({
-        title: `Bansos: ${b.title || b.name}`,
-        date: new Date(b.created_at).toLocaleDateString("id-ID"),
+        title: `Bansos: ${b.aid_name || b.name || "Program Bantuan"}`,
+        date: new Date(b.created_at),
       })),
     ]
 
     news.value = combined
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
-      .slice(0, 5)
+      .filter((item) => item.date >= oneWeekAgo)
+      .sort((a, b) => b.date - a.date)
+      .map((item) => ({
+        ...item,
+        date: item.date.toLocaleDateString("id-ID"),
+      }))
   } catch (err) {
     console.error("Gagal memuat data dashboard:", err)
   } finally {
@@ -151,32 +160,28 @@ const statCards = computed(() => [
     iconBg: "bg-teal-100",
   },
   {
-    label: "Total Penduduk",
+    label: "Jumlah Penduduk",
     value: stats.value.totalResidents,
-    icon: "fa fa-users text-blue-600",
-    iconBg: "bg-blue-100",
+    icon: "fa fa-users text-green-700",
+    iconBg: "bg-green-100",
   },
   {
     label: "Pembangunan",
     value: stats.value.developments,
-    icon: "fa fa-building text-yellow-600",
-    iconBg: "bg-yellow-100",
+    icon: "fa fa-building text-green-700",
+    iconBg: "bg-green-100",
   },
   {
-    label: "Acara Desa",
+    label: "Kepala Rumah",
+    value: stats.value.headFamilies,
+    icon: "fa fa-crown text-green-700",
+    iconBg: "bg-green-100",
+  },
+  {
+    label: "Total Acara",
     value: stats.value.events,
-    icon: "fa fa-calendar text-pink-600",
-    iconBg: "bg-pink-100",
-  },
-  {
-    label: "Bansos",
-    value: stats.value.socialAids,
-    icon: "fa fa-hand-holding-heart text-green-600",
+    icon: "fa fa-calendar text-green-700",
     iconBg: "bg-green-100",
   },
 ])
 </script>
-
-<style scoped>
-@reference "tailwindcss";
-</style>

@@ -92,23 +92,14 @@
 
       <!-- Detail (expandable) -->
       <transition name="fade">
-        <div
-          v-if="expandedIndex === index"
-          class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-        >
+      <div v-if="expandedIndex === index" class="mt-6">
+        <!-- Baris info utama -->
+        <div class="flex flex-wrap gap-4 mb-2">
           <div class="flex items-center gap-3 bg-blue-50 px-3 py-2 rounded-lg">
             <i class="fa fa-wallet text-blue-600 text-xl"></i>
             <div>
               <p class="text-blue-800 font-semibold">Rp {{ Number(aid.nominal).toLocaleString('id-ID') }}</p>
               <p class="text-xs text-gray-600">Nominal Bantuan</p>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-3 bg-yellow-50 px-3 py-2 rounded-lg md:col-span-2">
-            <i class="fa fa-align-left text-yellow-600 text-xl"></i>
-            <div>
-              <p class="text-yellow-800 font-semibold">{{ aid.description || '-' }}</p>
-              <p class="text-xs text-gray-600">Deskripsi</p>
             </div>
           </div>
 
@@ -119,8 +110,23 @@
               <p class="text-xs text-gray-600">Dibuat Pada</p>
             </div>
           </div>
+
+          <div class="flex items-center gap-3 bg-purple-50 px-3 py-2 rounded-lg">
+            <i class="fa fa-users text-purple-600 text-xl"></i>
+            <div>
+              <p class="text-purple-800 font-semibold">{{ aid.recipients?.length || 0 }}</p>
+              <p class="text-xs text-gray-600">Jumlah Penerima</p>
+            </div>
+          </div>
         </div>
-      </transition>
+
+        <!-- Deskripsi -->
+        <div class="bg-yellow-50 px-3 py-2 rounded-lg">
+          <p class="text-yellow-800 font-semibold">{{ aid.description || '-' }}</p>
+          <p class="text-xs text-gray-600">Deskripsi</p>
+        </div>
+      </div>
+    </transition>
     </div>
 
     <!-- Pagination -->

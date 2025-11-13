@@ -93,9 +93,9 @@
       <!-- Detail (expandable) -->
       <transition name="fade">
       <div v-if="expandedIndex === index" class="mt-6">
-        <!-- Baris info utama -->
+        <!-- Baris info utama: flex + flex-1 supaya masing-masing item mengisi lebar -->
         <div class="flex flex-wrap gap-4 mb-2">
-          <div class="flex items-center gap-3 bg-blue-50 px-3 py-2 rounded-lg">
+          <div class="flex-1 flex items-center gap-3 bg-blue-50 px-3 py-2 rounded-lg">
             <i class="fa fa-wallet text-blue-600 text-xl"></i>
             <div>
               <p class="text-blue-800 font-semibold">Rp {{ Number(aid.nominal).toLocaleString('id-ID') }}</p>
@@ -103,7 +103,7 @@
             </div>
           </div>
 
-          <div class="flex items-center gap-3 bg-green-50 px-3 py-2 rounded-lg">
+          <div class="flex-1 flex items-center gap-3 bg-green-50 px-3 py-2 rounded-lg">
             <i class="fa fa-calendar text-green-600 text-xl"></i>
             <div>
               <p class="text-green-800 font-semibold">{{ formatDate(aid.created_at) }}</p>
@@ -111,7 +111,7 @@
             </div>
           </div>
 
-          <div class="flex items-center gap-3 bg-purple-50 px-3 py-2 rounded-lg">
+          <div class="flex-1 flex items-center gap-3 bg-purple-50 px-3 py-2 rounded-lg">
             <i class="fa fa-users text-purple-600 text-xl"></i>
             <div>
               <p class="text-purple-800 font-semibold">{{ aid.recipients?.length || 0 }}</p>
@@ -120,7 +120,7 @@
           </div>
         </div>
 
-        <!-- Deskripsi -->
+        <!-- Deskripsi di bawah baris utama -->
         <div class="bg-yellow-50 px-3 py-2 rounded-lg">
           <p class="text-yellow-800 font-semibold">{{ aid.description || '-' }}</p>
           <p class="text-xs text-gray-600">Deskripsi</p>

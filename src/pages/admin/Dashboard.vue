@@ -1,29 +1,70 @@
 <template>
-  <div class="p-6 bg-blue-50 min-h-screen space-y-8">
+  <div class="p-6 bg-[#f3faf7] min-h-screen space-y-10">
     <!-- Judul -->
-    <h1 class="text-3xl font-bold text-gray-800 mb-4">Dashboard Desa</h1>
+    <h1 class="text-2xl md:text-3xl font-semibold text-gray-800">
+      Statistik Desa
+    </h1>
 
-    <!-- Statistik Ringkas -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+    <!-- Grid Utama -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+      <!-- Card Besar - Bantuan Sosial -->
       <div
-        v-for="(item, i) in statCards"
-        :key="i"
-        class="bg-white rounded-2xl shadow p-6 flex items-center gap-4 transition hover:shadow-lg hover:scale-[1.02]"
+        class="lg:col-span-2 rounded-3xl text-white shadow-lg p-10 flex flex-col justify-between min-h-[320px]"
+        style="background: linear-gradient(135deg, #9DDE60 0%, #3B6636 66%, #062B24 100%)"
       >
-        <div :class="item.iconBg" class="p-3 rounded-full">
-          <i :class="item.icon" class="text-2xl"></i>
-        </div>
         <div>
-          <h3 class="text-gray-600 text-sm">{{ item.label }}</h3>
-          <p class="text-2xl font-bold text-gray-800">{{ item.value }}</p>
+          <div
+            class="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center mb-6"
+          >
+            <i class="fa fa-hand-holding-heart text-white text-3xl"></i>
+          </div>
+          <h4 class="text-base uppercase tracking-wide font-medium text-green-100">
+            Bantuan Sosial
+          </h4>
+          <h2 class="text-3xl md:text-4xl font-bold mb-3">
+            Dari Desa untuk Warga
+          </h2>
+          <p class="text-green-100 text-sm md:text-base leading-relaxed max-w-lg">
+            Wujudkan kesejahteraan desa dengan bantuan sosial yang tepat sasaran.
+          </p>
+        </div>
+
+        <div class="mt-10">
+          <p class="text-6xl font-extrabold">{{ stats.socialAids }}</p>
+          <p class="text-green-100 text-sm mt-1">Total Program Bansos</p>
+        </div>
+      </div>
+
+      <!-- Card Statistik (2x2 Grid) -->
+      <div class="grid grid-cols-2 grid-rows-2 gap-4 h-full">
+        <div
+          v-for="(item, i) in filteredStatCards"
+          :key="i"
+          class="bg-white rounded-2xl p-5 shadow hover:shadow-lg transition flex flex-col justify-between items-start aspect-square"
+        >
+          <div class="flex items-center justify-between w-full mb-2">
+            <h3 class="text-gray-600 text-sm font-medium">
+              {{ item.label }}
+            </h3>
+            <div
+              class="w-8 h-8 flex items-center justify-center rounded-full"
+              :class="item.iconBg"
+            >
+              <i :class="item.icon" class="text-lg"></i>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">{{ item.value }}</p>
         </div>
       </div>
     </div>
 
     <!-- Informasi Terbaru -->
     <div class="bg-white rounded-2xl shadow p-6">
-      <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-        <i class="fa fa-bullhorn text-teal-500"></i> Informasi Terbaru
+      <h2
+        class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
+      >
+        <i class="fa fa-bullhorn text-teal-500"></i>
+        Informasi Terbaru (7 Hari Terakhir)
       </h2>
       <ul>
         <li
@@ -33,6 +74,12 @@
         >
           <span class="text-gray-700">{{ item.title }}</span>
           <span class="text-sm text-gray-500">{{ item.date }}</span>
+        </li>
+        <li
+          v-if="news.length === 0"
+          class="text-gray-500 text-sm italic py-2"
+        >
+          Tidak ada informasi terbaru minggu ini.
         </li>
       </ul>
     </div>
@@ -52,7 +99,6 @@ const stats = ref({
   socialAids: 0,
 })
 
-// 🔹 Info terbaru (dinamis)
 const news = ref([])
 
 onMounted(fetchDashboardData)
@@ -72,7 +118,7 @@ async function fetchDashboardData() {
     const families = familiesRes.data || []
     const totalResidents = families.reduce((sum, f) => {
       const count = f.residents ? f.residents.length : f.residents_count || 0
-      return sum + count + 1 // kepala keluarga juga dihitung
+      return sum + count + 1
     }, 0)
 
     stats.value = {
@@ -87,62 +133,57 @@ async function fetchDashboardData() {
     const combined = [
       ...devRes.data.map((d) => ({
         title: `Pembangunan: ${d.title || d.name}`,
-        date: new Date(d.created_at).toLocaleDateString("id-ID"),
+        date: new Date(d.created_at),
       })),
       ...eventsRes.data.map((e) => ({
         title: `Acara: ${e.title || e.name}`,
-        date: new Date(e.created_at).toLocaleDateString("id-ID"),
+        date: new Date(e.created_at),
       })),
       ...bansosRes.data.map((b) => ({
-        title: `Bansos: ${b.title || b.name}`,
-        date: new Date(b.created_at).toLocaleDateString("id-ID"),
+        title: `Bansos: ${b.aid_name || b.name || "Program Bantuan"}`,
+        date: new Date(b.created_at),
       })),
     ]
 
-    // 🔹 Urutkan berdasarkan tanggal terbaru
+    const oneWeekAgo = new Date()
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+
     news.value = combined
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
-      .slice(0, 5)
+      .filter((item) => item.date >= oneWeekAgo)
+      .sort((a, b) => b.date - a.date)
+      .map((item) => ({
+        ...item,
+        date: item.date.toLocaleDateString("id-ID"),
+      }))
   } catch (err) {
-    console.error("Gagal memuat data dashboard:", err)
+    console.error("Gagal memuat data dashboard admin:", err)
   }
 }
 
-// 🔹 Statistik Ringkas
-const statCards = computed(() => [
+const filteredStatCards = computed(() => [
   {
-    label: "Kepala Keluarga",
-    value: stats.value.headFamilies,
-    icon: "fa fa-user-tie text-teal-600",
-    iconBg: "bg-teal-100",
-  },
-  {
-    label: "Total Penduduk",
+    label: "Jumlah Penduduk",
     value: stats.value.totalResidents,
-    icon: "fa fa-users text-blue-600",
-    iconBg: "bg-blue-100",
+    icon: "fa fa-users text-green-700",
+    iconBg: "bg-green-100",
   },
   {
     label: "Pembangunan",
     value: stats.value.developments,
-    icon: "fa fa-building text-yellow-600",
-    iconBg: "bg-yellow-100",
+    icon: "fa fa-building text-green-700",
+    iconBg: "bg-green-100",
   },
   {
-    label: "Acara Desa",
+    label: "Kepala Rumah",
+    value: stats.value.headFamilies,
+    icon: "fa fa-crown text-green-700",
+    iconBg: "bg-green-100",
+  },
+  {
+    label: "Total Acara",
     value: stats.value.events,
-    icon: "fa fa-calendar text-pink-600",
-    iconBg: "bg-pink-100",
-  },
-  {
-    label: "Bansos",
-    value: stats.value.socialAids,
-    icon: "fa fa-hand-holding-heart text-green-600",
+    icon: "fa fa-calendar text-green-700",
     iconBg: "bg-green-100",
   },
 ])
 </script>
-
-<style scoped>
-@reference "tailwindcss";
-</style>

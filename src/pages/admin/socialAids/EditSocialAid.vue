@@ -221,7 +221,7 @@ async function updateAid() {
     )
 
     toastSuccess('Data bantuan sosial berhasil diperbarui')
-    router.push('/admin/social-aids')
+    router.push('/admin/social-aids/list')
   } catch (err) {
     console.error(err)
     toastError('Gagal memperbarui data')

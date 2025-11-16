@@ -51,7 +51,7 @@
           <i class="fa fa-edit"></i> Edit
         </button>
         <button
-          @click="router.push('/admin/social-aids')"
+          @click="router.push('/admin/social-aids/list')"
           class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-lg flex items-center gap-2"
         >
           <i class="fa fa-arrow-left"></i> Kembali

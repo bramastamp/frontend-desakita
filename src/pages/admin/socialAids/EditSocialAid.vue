@@ -104,6 +104,7 @@
               v-else
               class="border border-gray-200 rounded-lg p-3 max-h-60 overflow-y-auto"
             >
+            
               <div
                 v-for="family in paginatedFamilies"
                 :key="family.id"
@@ -127,6 +128,32 @@
                 Tidak ada hasil yang cocok.
               </div>
             </div>
+
+            <!-- Pagination -->
+            <div
+              v-if="filteredFamilies.length > itemsPerPage"
+              class="flex justify-center items-center mt-3 gap-2 col-span-2"
+            >
+              <button
+                @click="prevPage"
+                :disabled="currentPage === 1"
+                class="px-2 py-1 border rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+              >
+                ‹
+              </button>
+
+              <span class="text-gray-700 text-sm">
+                Halaman {{ currentPage }} dari {{ totalPages }}
+              </span>
+
+              <button
+                @click="nextPage"
+                :disabled="currentPage === totalPages"
+                class="px-2 py-1 border rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+              >
+                ›
+              </button>
+            </div>
           </div>
         </div>
 
@@ -134,7 +161,7 @@
         <div class="col-span-2 flex justify-end mt-6 space-x-3">
           <button
             type="button"
-            @click="router.push('/admin/social-aids')"
+            @click="router.push('/admin/social-aids/' + route.params.id)"
             class="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 transition"
           >
             Batal
@@ -177,7 +204,7 @@ const loadingRecipients = ref(true);
 const searchInput = ref('');
 const searchQuery = ref('');
 const currentPage = ref(1);
-const itemsPerPage = 10;
+const itemsPerPage = 5;
 
 function handleFileUpload(event) {
   const file = event.target.files[0];

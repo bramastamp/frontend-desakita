@@ -80,12 +80,6 @@
 
           <template v-else-if="['approved', 'rejected'].includes(aid.pivot.status)">
             <span>Status: {{ aid.pivot.status }}</span>
-            <button
-              @click="updateStatus(aid.id, 'distributed')"
-              class="ml-2 bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded-md text-xs"
-            >
-              Batalkan
-            </button>
           </template>
 
           <template v-else>

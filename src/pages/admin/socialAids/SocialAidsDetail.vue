@@ -46,9 +46,9 @@
       <div class="flex justify-end gap-3 mb-8">
         <button
           @click="router.push(`/admin/social-aids/${aid.id}/edit`)"
-          class="bg-teal-500 hover:bg-teal-600 text-white px-5 py-2 rounded-lg flex items-center gap-2"
+          class="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2 rounded-lg flex items-center gap-2"
         >
-          <i class="fa fa-edit"></i> Edit
+          <i class="fa fa-edit"></i> Kelola
         </button>
         <button
           @click="router.push('/admin/social-aids/list')"

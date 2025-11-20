@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 bg-[#f3faf7] min-h-screen space-y-10">
+  <div class="p-6 bg-blue min-h-screen space-y-10">
     <!-- Judul -->
     <h1 class="text-2xl md:text-3xl font-semibold text-gray-800">
       Statistik Desa

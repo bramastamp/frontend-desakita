@@ -6,7 +6,7 @@
     </div>
 
     <nav class="mt-3">
-      <ul class="space-y-1">
+      <ul class="space-y-2">
         <li v-for="item in menuItems" :key="item.name">
           <div v-if="item.children">
             <!-- Parent item -->

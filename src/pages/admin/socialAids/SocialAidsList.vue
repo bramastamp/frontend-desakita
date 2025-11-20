@@ -61,7 +61,7 @@
           <img
             :src="aid.thumbnail || 'https://via.placeholder.com/100?text=Bantuan'"
             alt="Thumbnail"
-            class="w-20 h-20 rounded-xl object-cover"
+            class="w-24 h-20 rounded-xl object-cover"
           />
           <div>
             <h2 class="text-lg font-semibold text-gray-800">{{ aid.aid_name }}</h2>
@@ -76,7 +76,7 @@
         <div class="flex gap-2">
           <button
             @click.stop="router.push(`/admin/social-aids/${aid.id}`)"
-            class="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2 rounded-lg flex items-center gap-2"
+            class="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg flex items-center gap-2"
           >
             <i class="fa fa-eye"></i> Lihat
           </button>

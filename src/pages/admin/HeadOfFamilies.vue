@@ -74,20 +74,29 @@
 
         <!-- Kanan -->
         <div class="flex gap-2">
-          <button
-            @click.stop="router.push(`/admin/head-of-families/edit/${family.id}`)"
-            class="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2 rounded-lg flex items-center gap-2"
-          >
-            <i class="fa fa-edit"></i> Kelola
-          </button>
-          <button
-            @click.stop="deleteFamily(family.id)"
-            class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg flex items-center justify-center"
-            title="Hapus Kepala Rumah"
-          >
-            <i class="fa fa-trash"></i>
-          </button>
-        </div>
+  <button
+    @click.stop="router.push(`/admin/head-of-families/detail/${family.id}`)"
+    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+  >
+    <i class="fa fa-eye"></i> Lihat
+  </button>
+
+  <button
+    @click.stop="router.push(`/admin/head-of-families/edit/${family.id}`)"
+    class="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2 rounded-lg flex items-center gap-2"
+  >
+    <i class="fa fa-edit"></i> Kelola
+  </button>
+
+  <button
+    @click.stop="deleteFamily(family.id)"
+    class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg flex items-center justify-center"
+    title="Hapus Kepala Rumah"
+  >
+    <i class="fa fa-trash"></i>
+  </button>
+</div>
+
       </div>
 
       <!-- Detail (expandable) -->

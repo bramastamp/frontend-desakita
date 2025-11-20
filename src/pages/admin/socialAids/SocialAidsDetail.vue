@@ -181,7 +181,7 @@ const loading = ref(true)
 const loadingRecipients = ref(true)
 
 const currentPage = ref(1)
-const itemsPerPage = 10
+const itemsPerPage = 5
 
 // Debounce mekanisme pencarian (500 ms)
 let debounceTimer

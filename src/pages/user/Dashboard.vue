@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 bg-gray-50 min-h-screen space-y-10">
+  <div class="p-6 bg-blue-50 min-h-screen space-y-10">
     <!-- Judul -->
     <h1 class="text-2xl md:text-3xl font-semibold text-gray-800">
       Dashboard Warga

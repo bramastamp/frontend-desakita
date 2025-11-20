@@ -121,7 +121,7 @@
         </div>
 
         <!-- Pagination -->
-        <div v-if="totalPages > 1" class="flex justify-center items-center mt-3 gap-2">
+        <div v-if="filteredFamilies.length > itemsPerPage" class="flex justify-center items-center mt-3 gap-2">
           <button
             @click="prevPage"
             :disabled="currentPage === 1"
@@ -210,7 +210,7 @@ onMounted(async () => {
 const searchInput = ref('')
 const searchQuery = ref('') // untuk debounce
 const currentPage = ref(1)
-const itemsPerPage = 10
+const itemsPerPage = 5
 
 // Debounce pencarian (500 ms)
 let debounceTimer

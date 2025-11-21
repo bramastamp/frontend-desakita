@@ -109,10 +109,13 @@
             >
             <select v-model="form.relation" class="input" required>
               <option value="">-- Pilih --</option>
-              <option value="Istri">Istri</option>
-              <option value="Anak">Anak</option>
-              <option value="Orang Tua">Orang Tua</option>
-              <option value="lainnya">Lainnya</option>
+              <option
+                v-for="item in relationOptions"
+                :key="item"
+                :value="item"
+              >
+                {{ item }}
+              </option>
             </select>
           </div>
         </div>
@@ -132,7 +135,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed, watch } from "vue";
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { User } from 'lucide-vue-next';
@@ -140,6 +143,7 @@ import { toastError, toastSuccess, toastWarning } from '../../utils/toast';
 
 const router = useRouter();
 const BASE_URL = 'http://127.0.0.1:8000';
+const headGender = ref("");
 
 const form = ref({
   head_of_family_id: '',
@@ -165,6 +169,7 @@ onMounted(async () => {
       headers: { Authorization: `Bearer ${token}` },
     });
     form.value.head_of_family_id = res.data.id;
+    headGender.value = res.data.gender; // <--- Tambahkan ini
   } catch (error) {
     console.error('Gagal mendapatkan data kepala keluarga:', error);
     toastError('Tidak dapat memuat data kepala keluarga Anda.');
@@ -238,6 +243,29 @@ async function submitForm() {
     toastError('Gagal menambahkan anggota. Periksa kembali data Anda.');
   }
 }
+
+const relationOptions = computed(() => {
+  if (!headGender.value) return [];
+
+  if (headGender.value === "female") {
+    // Kepala keluarga perempuan → pasangannya adalah Suami
+    return ["Suami", "Anak", "Orang Tua", "Mertua", "Cucu", "Kerabat"];
+  }
+
+  if (headGender.value === "male") {
+    // Kepala keluarga laki-laki → pasangannya adalah Istri
+    return ["Istri", "Anak", "Orang Tua", "Mertua", "Cucu", "Kerabat"];
+  }
+
+  return ["Anak", "Orang Tua", "Mertua", "Cucu", "Kerabat"];
+});
+
+watch(headGender, () => {
+  if (!relationOptions.value.includes(form.value.relation)) {
+    form.value.relation = "";
+  }
+});
+
 
 function validateForm() {
   if (

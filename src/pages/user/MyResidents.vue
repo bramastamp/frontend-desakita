@@ -14,16 +14,12 @@
         class="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
       />
       <div class="flex gap-3 mt-3 md:mt-0">
-        <div
-          class="flex items-center gap-2 bg-green-50 border border-gray-200 px-3 py-2 rounded-lg"
-        >
-          <span class="text-sm text-gray-600">Show</span>
-          <select
-            v-model="entriesPerPage"
-            class="border-none focus:ring-0 bg-green-50"
-          >
-            <option v-for="n in [5, 10, 20, 50]" :key="n" :value="n">
-              {{ n }} Entries
+        <div class="flex items-center gap-2 bg-green-50 border border-gray-200 px-3 py-2 rounded-lg">
+          <span class="text-sm text-gray-600">Filter</span>
+          <select v-model="relationFilter" class="border-none bg-green-50 focus:ring-0">
+            <option value="">Semua</option>
+            <option v-for="rel in availableRelations" :key="rel" :value="rel">
+              {{ rel }}
             </option>
           </select>
         </div>
@@ -37,8 +33,35 @@
       </div>
     </div>
 
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center items-center py-20">
+      <div class="flex flex-col items-center text-gray-600">
+        <svg class="animate-spin h-8 w-8 text-teal-500 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+        </svg>
+        <p class="text-sm">Memuat data anggota keluarga...</p>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div
+      v-else-if="!residents.length"
+      class="text-center text-gray-500 py-20"
+    >
+      <i class="fa fa-user-friends text-5xl text-gray-400 mb-4"></i>
+      <p class="text-lg font-medium">Belum ada anggota keluarga</p>
+      <p class="text-sm text-gray-400">Tambahkan anggota untuk memulai</p>
+    </div>
+
     <!-- Kelompok Berdasarkan Relasi -->
-    <div v-for="(group, relation) in groupedResidents" :key="relation" class="mb-8">
+    <div
+      v-else
+      v-for="(group, relation) in groupedResidents"
+      :key="relation"
+      class="mb-8"
+    >
       <!-- Judul Relasi -->
       <h2 class="text-xl font-semibold text-teal-700 border-l-4 border-teal-500 pl-3 mb-4">
         {{ relation }}
@@ -84,9 +107,9 @@
           <div class="flex justify-end gap-2 w-full md:w-auto mt-2 md:mt-0">
             <button
               @click.stop="router.push(`/user/my-residents/edit/${resident.id}`)"
-              class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm"
+              class="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2 rounded-lg flex items-center gap-2"
             >
-              <i class="fa fa-edit"></i> Manage
+              <i class="fa fa-edit"></i> Kelola
             </button>
             <button
               @click.stop="deleteResident(resident.id)"
@@ -101,33 +124,6 @@
 
       <!-- Jika Tidak Ada Anggota di Relasi Tersebut -->
       <p v-else class="text-gray-500 italic ml-2">Belum ada anggota dengan relasi ini.</p>
-    </div>
-
-    <!-- Pagination -->
-    <div
-      class="flex justify-between items-center mt-6 text-sm text-gray-500"
-      v-if="filteredResidents.length > entriesPerPage"
-    >
-      <span
-        >Showing {{ startIndex + 1 }}–{{ endIndex }} of
-        {{ filteredResidents.length }}</span
-      >
-      <div class="flex gap-2">
-        <button
-          @click="prevPage"
-          :disabled="page === 1"
-          class="px-3 py-1 border rounded disabled:opacity-50"
-        >
-          Prev
-        </button>
-        <button
-          @click="nextPage"
-          :disabled="endIndex >= filteredResidents.length"
-          class="px-3 py-1 border rounded disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
     </div>
   </div>
 </template>
@@ -146,10 +142,12 @@ const searchQuery = ref("");
 const debouncedQuery = ref("");
 const entriesPerPage = ref(10);
 const page = ref(1);
+const loading = ref(true)
 
 onMounted(fetchResidents);
 
 async function fetchResidents() {
+  loading.value = true
   try {
     const token = localStorage.getItem("token");
     const response = await axios.get(`${BASE_URL}/api/my-residents`, {
@@ -161,15 +159,18 @@ async function fetchResidents() {
       name: r.name,
       nik: r.nik,
       occupation: r.occupation,
-      relation: r.relation || "Lainnya",
+      relation: formatRelation(r.relation),
       photo: r.photo ? `${BASE_URL}/storage/${r.photo}` : null,
       date_of_birth: r.date_of_birth,
       age: calculateAge(r.date_of_birth),
     }));
   } catch (error) {
     console.error("Gagal mengambil data anggota:", error);
+  } finally {
+    loading.value = false; // <- loading selesai
   }
 }
+
 
 function calculateAge(date) {
   if (!date) return "-";
@@ -202,37 +203,55 @@ watch(searchQuery, (newQuery) => {
 
 const filteredResidents = computed(() => {
   const q = debouncedQuery.value.toLowerCase();
-  return residents.value.filter(
-    (r) =>
+
+  return residents.value.filter((r) => {
+    const matchSearch =
       r.name.toLowerCase().includes(q) ||
-      (r.nik && r.nik.toLowerCase().includes(q))
-  );
+      (r.nik && r.nik.toLowerCase().includes(q));
+
+    const matchRelation =
+      relationFilter.value === "" ||
+      r.relation === relationFilter.value;
+
+    return matchSearch && matchRelation;
+  });
 });
 
-const startIndex = computed(() => (page.value - 1) * entriesPerPage.value);
-const endIndex = computed(() =>
-  Math.min(startIndex.value + entriesPerPage.value, filteredResidents.value.length)
-);
-const paginatedResidents = computed(() =>
-  filteredResidents.value.slice(startIndex.value, endIndex.value)
-);
+function formatRelation(rel) {
+  if (!rel) return "Lainnya";
+
+  const cleaned = rel.trim().toLowerCase();
+
+  switch (cleaned) {
+    case "suami": return "Suami";
+    case "istri": return "Istri";
+    case "anak": return "Anak";
+    case "orangtua": return "Orang Tua";
+    case "mertua": return "Mertua";
+    case "cucu": return "Cucu";
+    case "kerabat": return "Kerabat";
+    default:
+      // Kapital huruf pertama untuk fallback
+      return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+  }
+}
 
 // 🔹 Grouping berdasarkan relasi
 const groupedResidents = computed(() => {
   const grouped = {};
-  paginatedResidents.value.forEach((r) => {
+  filteredResidents.value.forEach((r) => {
     if (!grouped[r.relation]) grouped[r.relation] = [];
     grouped[r.relation].push(r);
   });
   return grouped;
 });
 
-function nextPage() {
-  if (endIndex.value < filteredResidents.value.length) page.value++;
-}
-function prevPage() {
-  if (page.value > 1) page.value--;
-}
+const relationFilter = ref("");
+const availableRelations = computed(() => {
+  const set = new Set(residents.value.map(r => r.relation));
+  return Array.from(set);
+});
+
 function openAddModal() {
   router.push("/user/my-residents/add");
 }

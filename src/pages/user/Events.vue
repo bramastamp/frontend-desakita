@@ -18,23 +18,44 @@
       </div>
     </div>
 
-    <!-- Daftar Acara -->
+    <!-- 🔹 Loading State -->
+    <div v-if="loading" class="flex justify-center items-center py-20">
+      <div class="flex flex-col items-center text-gray-600">
+        <svg class="animate-spin h-8 w-8 text-teal-500 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+        </svg>
+        <p class="text-sm">Memuat data acara desa...</p>
+      </div>
+    </div>
+
+    <!-- 🔹 Empty State -->
+    <div v-else-if="!events.length" class="text-center text-gray-500 py-20">
+      <i class="fa fa-calendar text-5xl text-gray-400 mb-4"></i>
+      <p class="text-lg font-medium">Belum ada acara desa</p>
+      <p class="text-sm text-gray-400">Acara akan muncul di sini ketika tersedia</p>
+    </div>
+
+    <!-- 🔹 Daftar Acara -->
     <div
+      v-else
       v-for="(event, index) in paginatedEvents"
       :key="event.id"
       class="bg-white p-5 mb-4 rounded-2xl transition cursor-pointer"
       @click="toggleExpand(index)"
     >
       <div class="flex justify-between items-center">
-        <!-- Kiri -->
         <div class="flex items-center gap-4">
           <img
             :src="event.event_photo || 'https://via.placeholder.com/100x80?text=No+Image'"
             alt="Foto Event"
             class="w-24 h-20 object-cover rounded-lg"
           />
+
           <div>
             <h2 class="text-lg font-semibold text-gray-800">{{ event.title }}</h2>
+
             <p class="text-sm text-gray-600 flex items-center gap-1 mb-1">
               <i class="fa fa-user"></i> Penanggung Jawab:
               <span class="font-semibold">{{ event.pic }}</span>
@@ -54,7 +75,7 @@
         </div>
       </div>
 
-      <!-- Detail (expandable) -->
+      <!-- Detail -->
       <transition name="fade">
         <div v-if="expandedIndex === index" class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="flex items-center gap-3 bg-red-50 px-3 py-2 rounded-lg">
@@ -85,7 +106,10 @@
     </div>
 
     <!-- Pagination -->
-    <div class="flex justify-between items-center mt-6 text-sm text-gray-500">
+    <div
+      v-if="!loading && events.length"
+      class="flex justify-between items-center mt-6 text-sm text-gray-500"
+    >
       <span>Showing {{ startIndex + 1 }}–{{ endIndex }} of {{ filteredEvents.length }}</span>
       <div class="flex gap-2">
         <button @click="prevPage" :disabled="page === 1" class="px-3 py-1 border rounded disabled:opacity-50">
@@ -100,10 +124,6 @@
         </button>
       </div>
     </div>
-
-    <p v-if="filteredEvents.length === 0" class="text-center text-gray-500 mt-10">
-      Tidak ada acara ditemukan.
-    </p>
   </div>
 </template>
 
@@ -113,6 +133,7 @@ import axios from "axios"
 
 const BASE_URL = "http://127.0.0.1:8000"
 const events = ref([])
+const loading = ref(true)        // <= Tambahan
 const searchQuery = ref("")
 const debouncedQuery = ref("")
 const entriesPerPage = ref(10)
@@ -123,11 +144,14 @@ const expandedDescriptions = ref({})
 // Ambil data acara publik
 onMounted(fetchEvents)
 async function fetchEvents() {
+  loading.value = true
   try {
     const res = await axios.get(`${BASE_URL}/api/public/events`)
     events.value = res.data
   } catch (err) {
     console.error("Gagal memuat data acara:", err)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -144,18 +168,17 @@ function getShortDescription(desc, index) {
   if (!desc) return "-"
   const limit = 120
   const expanded = expandedDescriptions.value[index]
-  if (desc.length <= limit) return desc
-  return expanded ? desc : desc.slice(0, limit) + "..."
+  return expanded || desc.length <= limit ? desc : desc.slice(0, limit) + "..."
 }
 
-// Debounce pencarian
+// Debounce Search
 let debounceTimer
 watch(searchQuery, (newQuery) => {
   clearTimeout(debounceTimer)
   debounceTimer = setTimeout(() => (debouncedQuery.value = newQuery), 400)
 })
 
-// Filter dan pagination
+// Filter & Pagination
 const filteredEvents = computed(() => {
   const q = debouncedQuery.value.toLowerCase()
   return events.value.filter(
@@ -165,6 +188,7 @@ const filteredEvents = computed(() => {
       e.location.toLowerCase().includes(q)
   )
 })
+
 const startIndex = computed(() => (page.value - 1) * entriesPerPage.value)
 const endIndex = computed(() =>
   Math.min(startIndex.value + entriesPerPage.value, filteredEvents.value.length)
@@ -172,6 +196,7 @@ const endIndex = computed(() =>
 const paginatedEvents = computed(() =>
   filteredEvents.value.slice(startIndex.value, endIndex.value)
 )
+
 function nextPage() {
   if (endIndex.value < filteredEvents.value.length) page.value++
 }
@@ -186,6 +211,7 @@ function formatDate(dateString) {
   return date.toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" })
 }
 </script>
+
 
 <style scoped>
 button i {

@@ -1,14 +1,14 @@
 <template>
   <div class="flex min-h-screen bg-blue-50">
     <!-- Sidebar -->
-    <div class="fixed left-0 top-0 h-full w-64 bg-white shadow-md z-40">
+    <div class="fixed left-0 top-0 h-full w-64 bg-white z-40">
       <UserSidebar />
     </div>
 
     <!-- Main content -->
     <div class="flex-1 flex flex-col ml-64">
       <!-- Topbar -->
-      <div class="fixed top-0 left-64 right-0 z-30 bg-white shadow-md">
+      <div class="fixed top-0 left-64 right-0 z-30 bg-white">
         <Navbar />
       </div>
 

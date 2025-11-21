@@ -19,8 +19,28 @@
       </div>
     </div>
 
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center items-center py-20">
+      <div class="flex flex-col items-center text-gray-600">
+        <svg class="animate-spin h-8 w-8 text-teal-500 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+        </svg>
+        <p class="text-sm">Memuat data pembangunan desa...</p>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else-if="!developments.length" class="text-center text-gray-500 py-20">
+      <i class="fa fa-building text-5xl text-gray-400 mb-4"></i>
+      <p class="text-lg font-medium">Belum ada data pembangunan</p>
+      <p class="text-sm text-gray-400">Data akan tampil di sini jika sudah ditambahkan oleh admin</p>
+    </div>
+
     <!-- Daftar Pembangunan -->
     <div
+      v-else
       v-for="(dev, index) in paginatedDevelopments"
       :key="index"
       class="bg-white p-5 mb-4 rounded-2xl transition cursor-pointer"
@@ -41,6 +61,7 @@
               <i class="fa fa-user"></i> Penanggung Jawab:
               <span class="font-semibold">{{ dev.pic }}</span>
             </p>
+
             <p class="text-sm text-gray-700">
               {{ getShortDescription(dev.description, index) }}
               <button
@@ -55,7 +76,7 @@
         </div>
       </div>
 
-      <!-- Detail (expandable) -->
+      <!-- Detail Expand -->
       <transition name="fade">
         <div v-if="expandedIndex === index" class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
           <div class="flex items-center gap-3 bg-red-50 px-3 py-2 rounded-lg">
@@ -94,7 +115,10 @@
     </div>
 
     <!-- Pagination -->
-    <div class="flex justify-between items-center mt-6 text-sm text-gray-500">
+    <div
+      v-if="!loading && developments.length"
+      class="flex justify-between items-center mt-6 text-sm text-gray-500"
+    >
       <span>Showing {{ startIndex + 1 }}–{{ endIndex }} of {{ filteredDevelopments.length }}</span>
       <div class="flex gap-2">
         <button
@@ -144,34 +168,43 @@ import { ref, computed, onMounted, watch } from "vue"
 import axios from "axios"
 
 const developments = ref([])
+const loading = ref(true)
+
 const searchQuery = ref("")
 const debouncedQuery = ref("")
 const entriesPerPage = ref(10)
 const page = ref(1)
 const BASE_URL = "http://127.0.0.1:8000"
+
 const showImageModal = ref(false)
 const selectedImage = ref(null)
 
-// 🔹 Ambil data
+// Fetch Data
 onMounted(fetchDevelopments)
 async function fetchDevelopments() {
+  loading.value = true
   try {
     const response = await axios.get(`${BASE_URL}/api/public/developments`)
     developments.value = response.data
   } catch (err) {
     console.error("Gagal mengambil data pembangunan:", err)
+  } finally {
+    loading.value = false
   }
 }
 
-// 🔹 Expand & deskripsi
+// Expand card
 const expandedIndex = ref(null)
 function toggleExpand(index) {
   expandedIndex.value = expandedIndex.value === index ? null : index
 }
+
+// Read more
 const expandedDescriptions = ref({})
 function toggleDescription(index) {
   expandedDescriptions.value[index] = !expandedDescriptions.value[index]
 }
+
 function getShortDescription(desc, index) {
   if (!desc) return "-"
   const limit = 120
@@ -180,7 +213,7 @@ function getShortDescription(desc, index) {
   return expanded ? desc : desc.slice(0, limit) + "..."
 }
 
-// 🔹 Pencarian & pagination
+// Search debounce
 let debounceTimer
 watch(searchQuery, (newQuery) => {
   clearTimeout(debounceTimer)
@@ -188,6 +221,7 @@ watch(searchQuery, (newQuery) => {
     debouncedQuery.value = newQuery
   }, 400)
 })
+
 const filteredDevelopments = computed(() => {
   const q = debouncedQuery.value.toLowerCase()
   return developments.value.filter(
@@ -197,36 +231,46 @@ const filteredDevelopments = computed(() => {
       d.location.toLowerCase().includes(q)
   )
 })
+
 const startIndex = computed(() => (page.value - 1) * entriesPerPage.value)
 const endIndex = computed(() =>
   Math.min(startIndex.value + entriesPerPage.value, filteredDevelopments.value.length)
 )
+
 const paginatedDevelopments = computed(() =>
   filteredDevelopments.value.slice(startIndex.value, endIndex.value)
 )
+
 function nextPage() {
   if (endIndex.value < filteredDevelopments.value.length) page.value++
 }
+
 function prevPage() {
   if (page.value > 1) page.value--
 }
 
-// 🔹 Formatter
+// Formatters
 function formatCurrency(amount) {
   if (!amount) return "0"
   return new Intl.NumberFormat("id-ID").format(amount)
 }
+
 function formatDate(dateString) {
   if (!dateString) return "-"
   const date = new Date(dateString)
-  return date.toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" })
+  return date.toLocaleDateString("id-ID", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })
 }
 
-// 🔹 Gambar Modal
+// Image modal
 function openImageModal(imageUrl) {
   selectedImage.value = imageUrl
   showImageModal.value = true
 }
+
 function closeImageModal() {
   showImageModal.value = false
   selectedImage.value = null

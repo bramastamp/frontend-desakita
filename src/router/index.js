@@ -37,6 +37,7 @@ import UserDashboard from '../pages/user/Dashboard.vue';
 import MyResidents from '../pages/user/MyResidents.vue';
 import MyResidentsAdd from '../pages/user/AddMyResident.vue';
 import MyResidentsEdit from '../pages/user/EditMyResident.vue';
+import MyHeadEdit from '../pages/user/EditMyHead.vue';
 import UserDevelopments from '../pages/user/Developments.vue';
 import UserEvents from '../pages/user/Events.vue';
 import UserSocialAidsList from '../pages/user/socialAids/SocialAidsList.vue';
@@ -86,6 +87,7 @@ const routes = [
       { path: 'developments', component: UserDevelopments },
       { path: 'events', component: UserEvents },
       { path: 'village-profile', component: VillageProfile },
+      { path: 'my-head/edit', component: MyHeadEdit },
 
       {
         path: 'social-aids',

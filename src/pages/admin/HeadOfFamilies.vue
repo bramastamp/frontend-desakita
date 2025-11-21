@@ -14,6 +14,7 @@
 
       <div class="flex gap-3 mt-3 md:mt-0">
         <div class="flex items-center gap-2 bg-green-50 border border-gray-200 px-3 py-2 rounded-lg">
+          <span class="text-sm text-gray-600">Show</span>
           <select v-model="entriesPerPage" class="border-none focus:ring-0 bg-green-50">
             <option v-for="n in [5,10,20,50]" :key="n" :value="n">{{ n }} Entries</option>
           </select>

@@ -25,8 +25,14 @@
         <!-- SHOW ENTRIES -->
         <div class="flex items-center gap-2 bg-green-50 border border-gray-200 px-3 py-2 rounded-lg">
           <span class="text-sm text-gray-600">Show</span>
-          <select v-model="entriesPerPage" class="border-none bg-green-50 focus:ring-0">
-            <option v-for="n in [5,10,20,50]" :key="n" :value="n">{{ n }} Entries</option>
+          <select
+            v-model="relationFilter"
+            class="border-none bg-green-50 focus:ring-0"
+          >
+            <option value="">Semua</option>
+            <option v-for="rel in availableRelations" :key="rel" :value="rel">
+              {{ rel }}
+            </option>
           </select>
         </div>
 
@@ -187,7 +193,7 @@ async function fetchResidents() {
       name: r.name,
       nik: r.nik,
       occupation: r.occupation,
-      relation: r.relation || "Lainnya",
+      relation: formatRelation(r.relation),
       photo: r.photo_url || null,
       age: calculateAge(r.date_of_birth),
     }));
@@ -198,6 +204,19 @@ async function fetchResidents() {
     loading.value = false; // <-- STOP LOADING
   }
 }
+
+function formatRelation(rel) {
+  if (!rel) return "Orang Tua";
+
+  const cleaned = rel.trim().toLowerCase();
+
+  if (cleaned === "suami") return "Suami";
+  if (cleaned === "istri") return "Istri";
+  if (cleaned === "anak") return "Anak";
+
+  return "Orang Tua";
+}
+
 
 function calculateAge(date) {
   if (!date) return "-";
@@ -216,18 +235,29 @@ watch(searchQuery, (newQuery) => {
 
 const filteredResidents = computed(() => {
   const q = debouncedQuery.value.toLowerCase();
-  return residents.value.filter(
-    (r) =>
+
+  return residents.value.filter((r) => {
+    const matchesSearch =
       r.name.toLowerCase().includes(q) ||
-      (r.nik && r.nik.toLowerCase().includes(q))
-  );
+      (r.nik && r.nik.toLowerCase().includes(q));
+
+    const matchesRelation =
+      !relationFilter.value || r.relation === relationFilter.value;
+
+    return matchesSearch && matchesRelation;
+  });
 });
+
 
 // Pagination
 const startIndex = computed(() => (page.value - 1) * entriesPerPage.value);
 const endIndex = computed(() =>
   Math.min(startIndex.value + entriesPerPage.value, filteredResidents.value.length)
 );
+
+const relationFilter = ref(""); // "" = tampilkan semua
+const availableRelations = ref(["Suami", "Istri", "Anak", "Orang Tua", "Mertua", "Cucu", "Kerabat"]);
+
 const paginatedResidents = computed(() =>
   filteredResidents.value.slice(startIndex.value, endIndex.value)
 );
@@ -238,14 +268,17 @@ function prevPage() { if (page.value > 1) page.value--; }
 // Group by relation
 const groupedResidents = computed(() => {
   const groups = {};
-  paginatedResidents.value.forEach((item) => {
+  
+  // Gunakan filteredResidents, bukan paginatedResidents
+  filteredResidents.value.forEach((item) => {
     if (!groups[item.relation]) groups[item.relation] = [];
     groups[item.relation].push(item);
   });
+
   return groups;
 });
-</script>
 
+</script>
 
 <style scoped>
 </style>

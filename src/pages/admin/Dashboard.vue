@@ -6,62 +6,59 @@
     </h1>
 
     <!-- Grid Utama -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+
       <!-- Card Besar - Bantuan Sosial -->
       <div
-        class="lg:col-span-2 rounded-3xl text-white shadow-lg p-10 flex flex-col justify-between min-h-[320px]"
+        class="lg:col-span-1 rounded-3xl text-white shadow-lg p-8 flex flex-col justify-between min-h-[260px]"
         style="background: linear-gradient(135deg, #9DDE60 0%, #3B6636 66%, #062B24 100%)"
       >
         <template v-if="loading">
-          <!-- Skeleton untuk card besar -->
+          <!-- Skeleton -->
           <div class="animate-pulse space-y-4">
-            <div class="w-14 h-14 bg-white/20 rounded-full"></div>
-            <div class="h-5 bg-white/30 rounded w-1/3"></div>
-            <div class="h-8 bg-white/30 rounded w-2/3"></div>
+            <div class="w-12 h-12 bg-white/20 rounded-full"></div>
+            <div class="h-4 bg-white/30 rounded w-1/3"></div>
+            <div class="h-7 bg-white/30 rounded w-2/3"></div>
             <div class="h-4 bg-white/30 rounded w-1/2"></div>
-            <div class="h-12 bg-white/20 rounded mt-6 w-24"></div>
+            <div class="h-10 bg-white/20 rounded mt-6 w-20"></div>
           </div>
         </template>
 
         <template v-else>
           <div>
-            <div
-              class="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center mb-6"
-            >
-              <i class="fa fa-hand-holding-heart text-white text-3xl"></i>
+            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-5">
+              <i class="fa fa-hand-holding-heart text-white text-2xl"></i>
             </div>
-            <h4 class="text-base uppercase tracking-wide font-medium text-green-100">
-              Bantuan Sosial
-            </h4>
-            <h2 class="text-3xl md:text-4xl font-bold mb-3">
+            <h4 class="text-sm uppercase tracking-wide text-green-100">Bantuan Sosial</h4>
+            <h2 class="text-2xl md:text-3xl font-bold leading-tight">
               Dari Desa untuk Warga
             </h2>
-            <p class="text-green-100 text-sm md:text-base leading-relaxed max-w-lg">
-              Wujudkan kesejahteraan desa dengan bantuan sosial yang tepat sasaran.
+            <p class="text-green-100 text-xs md:text-sm max-w-md mt-1">
+              Wujudkan kesejahteraan desa melalui program bansos yang tepat sasaran.
             </p>
           </div>
 
-          <div class="mt-10">
-            <p class="text-6xl font-extrabold">{{ stats.socialAids }}</p>
-            <p class="text-green-100 text-sm mt-1">Total Program Bansos</p>
+          <div class="mt-8">
+            <p class="text-5xl font-extrabold">{{ stats.socialAids }}</p>
+            <p class="text-green-100 text-xs mt-1">Total Program Bansos</p>
           </div>
         </template>
       </div>
 
       <!-- Card Statistik (2x2 Grid) -->
-      <div class="grid grid-cols-2 grid-rows-2 gap-4 h-full">
+      <div class="grid grid-cols-2 grid-rows-2 gap-4 h-full w-full auto-rows-fr">
+
         <template v-if="loading">
-          <!-- Skeleton untuk card kecil -->
           <div
             v-for="i in 4"
             :key="i"
             class="bg-white rounded-2xl p-5 shadow animate-pulse aspect-square"
           >
-            <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center justify-between mb-3">
               <div class="h-4 bg-gray-200 rounded w-1/2"></div>
               <div class="w-8 h-8 bg-gray-200 rounded-full"></div>
             </div>
-            <div class="h-6 bg-gray-200 rounded w-1/3 mt-4"></div>
+            <div class="h-7 bg-gray-200 rounded w-1/3 mt-4"></div>
           </div>
         </template>
 
@@ -69,22 +66,29 @@
           <div
             v-for="(item, i) in filteredStatCards"
             :key="i"
-            class="bg-white rounded-2xl p-5 shadow hover:shadow-lg transition flex flex-col justify-between items-start aspect-square"
+            class="bg-white rounded-2xl p-6 shadow hover:shadow-lg transition flex flex-col w-full h-full"
           >
-            <div class="flex items-center justify-between w-full mb-2">
-              <h3 class="text-gray-600 text-sm font-medium">
+            <div class="flex justify-between items-start w-full">
+              <h3 class="text-gray-600 text-sm font-medium leading-tight">
                 {{ item.label }}
               </h3>
+
+              <!-- ICON -->
               <div
-                class="w-8 h-8 flex items-center justify-center rounded-full"
+                class="w-9 h-9 flex items-center justify-center rounded-full"
                 :class="item.iconBg"
               >
                 <i :class="item.icon" class="text-lg"></i>
               </div>
             </div>
-            <p class="text-2xl font-bold text-gray-900">{{ item.value }}</p>
+
+            <!-- ANGKA -->
+            <p class="text-3xl font-bold text-gray-900 mt-auto">
+              {{ item.value }}
+            </p>
           </div>
         </template>
+
       </div>
     </div>
 

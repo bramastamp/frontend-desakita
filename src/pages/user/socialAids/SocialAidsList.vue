@@ -20,9 +20,13 @@
 
     <!-- Loading -->
     <div v-if="loading" class="flex justify-center items-center py-20">
-      <div class="text-center text-gray-600">
-        <i class="fa fa-spinner fa-spin text-teal-500 text-3xl mb-3"></i>
-        <p>Memuat data bantuan sosial...</p>
+      <div class="flex flex-col items-center text-gray-600">
+        <svg class="animate-spin h-8 w-8 text-teal-500 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+        </svg>
+        <p class="text-sm">Memuat data bantuan sosial...</p>
       </div>
     </div>
 
@@ -30,6 +34,7 @@
     <div v-else-if="!aids.length" class="text-center text-gray-500 py-20">
       <i class="fa fa-box-open text-5xl text-gray-400 mb-4"></i>
       <p class="text-lg font-medium">Belum ada bantuan sosial yang Anda ikuti</p>
+      <p class="text-sm text-gray-400">Anda akan melihat bantuan sosial Anda di sini</p>
     </div>
 
     <!-- Daftar bantuan -->
@@ -37,7 +42,7 @@
       v-else
       v-for="(aid, index) in paginatedAids"
       :key="aid.id"
-      class="bg-white p-5 mb-4 rounded-2xl transition cursor-pointer hover:shadow-md"
+      class="bg-white p-5 mb-4 rounded-2xl transition cursor-pointer"
       @click="toggleExpand(index)"
     >
       <div class="flex justify-between items-start flex-wrap gap-3">
